@@ -1,0 +1,19 @@
+<!doctype html>
+
+<head>
+  <title>Ferienpass Seeberg - Anmeldung Ferienpass</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/png" href="https://booking.ferienpass-seeberg.ch/ferienpass.webp">
+</head>
+
+<body>
+  <iframe id="iframe"
+    style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+
+  <script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    iframe.src = `https://script.google.com/macros/s/${GOOGLE_APP_SCRIPS_ID}/exec?action=${params.action ?? 'index'}&reference=${params.reference}&origin=${window.location.origin}`
+  </script>
+</body>

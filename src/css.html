@@ -1,0 +1,131 @@
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: darkseagreen;
+  }
+
+  .btn-custom {
+    --bd-violet-bg: darkseagreen;
+    --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: var(--bs-white);
+    --bs-btn-bg: var(--bd-violet-bg);
+    --bs-btn-border-color: rgb(70, 70, 70);
+    --bs-btn-hover-color: var(--bs-white);
+    --bs-btn-hover-bg: rgb(157, 207, 157);
+    --bs-btn-hover-border-color: rgb(70, 70, 70);
+    --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+    --bs-btn-active-color: var(--bs-btn-hover-color);
+    --bs-btn-active-bg: rgb(124, 163, 124);
+    --bs-btn-active-border-color: rgb(70, 70, 70);
+    --bs-btn-disabled-color: var(--bs-btn-hover-color);
+    --bs-btn-disabled-bg: rgb(132, 142, 132);
+    --bs-btn-disabled-border-color: rgb(70, 70, 70);
+  }
+
+  .ferienpass-logo {
+    max-width: 17em;
+  }
+
+  label {
+    font-size: 1.2em;
+    font-weight: 400;
+    font-family: 'Schoolbell';
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: darkseagreen;
+    font-family: 'Schoolbell';
+  }
+
+  th {
+    font-size: 1.2em;
+    font-weight: 400;
+  }
+
+  input[type='checkbox'] {
+    visibility: hidden;
+  }
+
+  input[type='checkbox']:checked:before,
+  input[type='checkbox']:before {
+    visibility: visible;
+    font-family: FontAwesome;
+    font-size: 1.6rem;
+    margin-top: -1em;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .confirm-label {
+    display: flex;
+  }
+
+  input[type='checkbox']:checked:before {
+    content: '\f14a';
+  }
+
+  input[type='checkbox']:before {
+    content: '\f096';
+  }
+
+  .form-control.no-validate:valid {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    padding: .375rem .75rem;
+    background: var(--bs-body-bg)
+  }
+
+  .form-select.no-validate:valid {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    padding: .375rem .75rem;
+    background-image: var(--bs-form-select-bg-img)
+  }
+
+  .bd-callout {
+    --bs-link-color-rgb: var(--bd-callout-link);
+    --bs-code-color: var(--bd-callout-code-color);
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: var(--bd-callout-color, inherit);
+    background-color: var(--bd-callout-bg, var(--bs-gray-100));
+    border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300))
+  }
+
+  .bd-callout h4 {
+    margin-bottom: .25rem
+  }
+
+  .bd-callout>:last-child {
+    margin-bottom: 0
+  }
+
+  .bd-callout+.bd-callout {
+    margin-top: -.25rem
+  }
+
+  .bd-callout .highlight {
+    background-color: rgba(0, 0, 0, 0.05)
+  }
+
+  .bd-callout-info {
+    --bd-callout-color: var(--bs-info-text-emphasis);
+    --bd-callout-bg: var(--bs-info-bg-subtle);
+    --bd-callout-border: var(--bs-info-border-subtle)
+  }
+
+  .bd-callout-warning {
+    --bd-callout-color: var(--bs-warning-text-emphasis);
+    --bd-callout-bg: var(--bs-warning-bg-subtle);
+    --bd-callout-border: var(--bs-warning-border-subtle)
+  }
+
+  .bd-callout-danger {
+    --bd-callout-color: var(--bs-danger-text-emphasis);
+    --bd-callout-bg: var(--bs-danger-bg-subtle);
+    --bd-callout-border: var(--bs-danger-border-subtle)
+  }
+</style>

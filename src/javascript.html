@@ -1,0 +1,206 @@
+<script>
+  const POLL_INTERVAL = 10000
+  const EVENTS_CONTAINER_ELEMENT_ID = 'events'
+
+  const refreshEvents = () => {
+    google.script.run.withSuccessHandler(events => {
+      updateEvents(events)
+      setTimeout(refreshEvents, POLL_INTERVAL)
+    }).getEvents()
+  }
+
+  const populateData = () => {
+    google.script.run.withSuccessHandler(events => {
+      const container = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
+      while (container.hasChildNodes()) container.removeChild(container.lastChild)
+      Object.values(events).forEach(event => addEventToForm(event))
+    }).getEvents()
+  }
+
+  const updateEvents = events => {
+    Object.values(events).forEach(event => {
+      const [id] = event
+      const container = document.getElementById(`event-${id}-status`)
+      if (container) container.innerHTML = getEventStatus(event)
+      else addEventToForm(event)
+    })
+  }
+
+  const getEventStatus = event => {
+    const [id, , , , , , , , , , , , participantLimit, bookings, availableSeats] = event
+    let [badgeState, badgeText] = ['success', 'freie Plätze']
+    if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
+    else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
+    return `
+    <br class="d-none d-lg-block">
+    <p>
+      <small class="d-none d-lg-block">
+        <i class="bi bi-people-fill"></i>&ensp;Max. Teilnehmerzahl: ${participantLimit}<br>
+        <i class="bi bi-pencil-square"></i>&ensp;Anzahl Anmeldungen: ${bookings}<br>
+        <i class="bi bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
+      </small>
+      <span class="badge text-bg-${badgeState} bg-${badgeState}">${badgeText}</span>
+    </p>
+  `
+  }
+
+  const addEventToForm = event => {
+    const [id, name, description, , costs, additionalCosts, day, date, startTime, endTime, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
+    const events = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
+
+    // Create a string to display the costs of the event
+    let costsDisplaySring = ''
+    if (costs + additionalCosts <= 0) costsDisplaySring = 'gratis'
+    else if (additionalCosts === 0) costsDisplaySring = `${costs} CHF`
+    else costsDisplaySring = `${costs} CHF (+ ${additionalCosts} CHF)`
+
+    // Create meta data which is used to filter the events by grade
+    const gradeMetaData = []
+    for (let i = gradeFrom; i <= gradeTo; i++) gradeMetaData.push(`grade-${i}`)
+
+    const result = `
+    <tr>
+      <td>
+        <input id="event-${id}-input" class="fa-checkbox-square" type="checkbox" name="eventId" value="${id}">
+      </td>
+      <td>${id}</td>
+      <td>
+        <label for="event-${id}-input">${name}</label>
+        <p class="d-none d-lg-block"><small>${description}</small></p>
+      </td>
+      <td>
+        <br class="d-none d-lg-block">
+        <div id="event-${id}-details">
+          <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
+            <i class="bi bi-calendar"></i>&ensp;${day}, ${date}<br>
+            <i class="bi bi-clock"></i>&ensp;${startTime} - ${endTime} Uhr<br>
+            <i class="bi bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
+            <i class="bi bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
+          </p>
+        </div>
+      </td>
+      <td>
+        <div id="event-${id}-status">
+          ${getEventStatus(event)}
+        </div>
+      </td>
+    </tr>
+  `
+    events.insertAdjacentHTML('beforeend', result)
+  }
+
+  const alertArea = document.getElementById('alertArea')
+  const clearAlert = id => document.getElementById(`alert-${id}`)?.remove()
+  const clearAllAlerts = () => alertArea.innerHTML = ''
+  const alert = async (type, head, body) => {
+    const id = Date.now()
+    const wrapper = document.createElement('div')
+    wrapper.id = `alert-${id}`
+    wrapper.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show">
+        <h4 class="alert-heading">${head}</h4>
+        <p>${body}</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    `
+    alertArea.append(wrapper)
+
+    // Wait 15 seconds before clearing the alert
+    await new Promise(r => setTimeout(r, 15000));
+    clearAlert(id)
+  }
+
+  $("#search-reset-btn").click(function () {
+    document.getElementById('search').value = ''
+    $("#events tr").filter(function () { $(this).toggle(true) });
+    $(this).prop('disabled', true)
+  })
+
+  $("#search").on("input propertychange paste", function () {
+    var words = $(this).val().toLowerCase().trim().split(' ').filter(e => String(e).trim());
+    const resetBtn = document.getElementById('search-reset-btn')
+    resetBtn.disabled = true
+    if (words.length > 0) {
+      resetBtn.disabled = false
+    }
+
+    $("#events tr").filter(function () {
+      const searchText = $(this).text().toLowerCase()
+      $(this).toggle(words.every(word => searchText.indexOf(word) > -1))
+    });
+  })
+
+  form.onsubmit = async e => {
+    e.preventDefault()
+    e.stopPropagation()
+    clearAllAlerts()
+
+    // Check for at least one event
+    if (!new FormData(form).has('eventId')) {
+      alert('warning', 'Unvollständige Anmeldung', 'Bitte wähle mindestens einen (1) Kurs aus. Es sollte für jeden und jede etwas spannendes dabei sein.')
+      return
+    }
+
+    // Check if selected events match the selected grade
+    const selectedEvents = [...new FormData(form).getAll('eventId')]
+    const selectedGrade = document.getElementById('grade').value
+    const nonMatchingEvents = []
+    selectedEvents.forEach(id => {
+      const eventMetaData = document.getElementById(`event-${id}-details`).outerHTML
+      !eventMetaData.includes(`grade-${selectedGrade}`) && nonMatchingEvents.push(id)
+    })
+    if (nonMatchingEvents.length > 0) {
+      alert('warning', 'Ungültige Kurse', `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt, die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
+      return
+    }
+
+    const modalDialogSend = new bootstrap.Modal('#modal-send')
+    const modalDialogSuccess = new bootstrap.Modal('#modal-success')
+
+    if (form.checkValidity()) {
+      modalDialogSend.show()
+      google.script.run
+        .withFailureHandler(error => {
+          modalDialogSend.hide()
+          alert('danger', 'Oh nein! Ein Fehler 🙈', 'Beim Speichern deiner Daten ist leider ein Fehler aufgetreten. Versuche es bitte nochmals und melde dich bei mir (E-Mail ist unten verlinkt), falls es weiterhin nicht funktioniert.')
+          console.log(error)
+        })
+        .withSuccessHandler(async redirectUrl => {
+          try {
+            window.top.location.href = redirectUrl;
+          }
+          catch (error) { console.log(error) }
+          finally {
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('btn-success-redirect').href = redirectUrl
+            modalDialogSend.hide()
+            modalDialogSuccess.show()
+          }
+        })
+        .processForm([...new FormData(form).entries()])
+    }
+    else {
+      alert('warning', 'Fehlende Angaben in der Anmeldung', 'Bitte fülle alle Felder aus. Ich habe sie dir oben rot markiert.')
+      form.classList.add('was-validated')
+    }
+  }
+
+  populateData()
+  setTimeout(refreshEvents, POLL_INTERVAL);
+
+  const bookingId = document.getElementById('bookingId').value
+  if (bookingId) {
+    google.script.run
+      .withSuccessHandler(bookings => {
+        const booking = Object.values(bookings).pop()
+        const [, , email, , , phone, address, zip, city] = booking
+        document.getElementById('email').value = email
+        document.getElementById('phone').value = phone
+        document.getElementById('address').value = address
+        document.getElementById('zip').value = zip
+        document.getElementById('city').value = city
+      })
+      .getBookings(bookingId)
+  }
+
+</script>

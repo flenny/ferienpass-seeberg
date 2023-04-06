@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <?!= include('head'); ?>
+  <?!= include('css'); ?>
+</head>
+
+<body id="body">
+  <div class="py-3 text-center">
+    <img class="d-block mx-auto ferienpass-logo" src="https://booking.ferienpass-seeberg.ch/ferienpass-transparent.webp"
+      alt="Logo Ferienpass Seeberg">
+  </div>
+  <div class="container container-sm bg-body-tertiary px-lg-5 py-5 rounded-3 border border-secondary">
+    <main>
+      <div class="text-center">
+        <h1 class="display-3">Deine gebuchten Kurse</h1>
+        <input type="hidden" id="reference" value="<?!= data.reference ?>">
+        <table class="table table-responsive table-sm" style="max-width: 35em; display: inline-table;">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Kurs</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="container">
+          </tbody>
+        </table>
+      </div>
+  </div>
+  </main>
+
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1"><i class="bi bi-c-circle"></i> 2023 Ferienpass Seeberg</p>
+  </footer>
+
+  <?!= include('theme'); ?>
+
+  <script>
+    const reference = document.getElementById('reference').value
+    const container = document.getElementById('container')
+    google.script.run
+      .withSuccessHandler(bookings => {
+        Object.values(bookings).forEach(booking => {
+          const tableRow = document.createElement('tr')
+          const [, , , firstName, lastName, , , , , , , , eventName, , , waitingList] = booking
+          const [badgeState, badgeText] = (waitingList === 'Nein') ? ['success', 'angemeldet'] : ['danger', 'auf Warteliste']
+          const row = `
+            <td>${firstName} ${lastName}</td>
+            <td>
+              <label>${eventName}</label>
+            </td>
+            <td><span class="badge bg-${badgeState}">${badgeText}</span></td>
+          `
+          tableRow.innerHTML = row
+          container.append(tableRow)
+        })
+      })
+      .getBookings(reference)
+  </script>
+</body>
+
+</html>

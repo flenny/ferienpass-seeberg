@@ -1,0 +1,21 @@
+{
+  "name": "Node",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:0-18",
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
+    "ghcr.io/devcontainers-contrib/features/neovim-apt-get:1": {}
+  },
+  "remoteUser": "node",
+  "postCreateCommand": "cd /workspaces/ferienpass-anmeldung && npm install && npm install @google/clasp --global",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "editorconfig.editorconfig",
+        "xabikos.javascriptsnippets",
+        "ecmel.vscode-html-css",
+        "github.copilot",
+        "GitHub.vscode-github-actions"
+      ]
+    }
+  }
+}

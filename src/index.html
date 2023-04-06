@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <?!= include('head'); ?>
+  <?!= include('css'); ?>
+</head>
+
+<body id="body">
+  <div class="py-3 text-center">
+    <img class="d-block mx-auto ferienpass-logo" src="https://booking.ferienpass-seeberg.ch/ferienpass-transparent.webp"
+      alt="Logo Ferienpass Seeberg">
+  </div>
+  <div class="container bg-body-tertiary px-lg-5 py-5 rounded-3 border border-secondary">
+    <main>
+      <form id="form" class="needs-validation" novalidate>
+        <input type="hidden" id="origin" value="<?!= data.origin ?>" name="origin">
+        <input type="hidden" id="bookingId" value="<?!= data.bookingId ?>">
+        <div class="row g-3">
+          <h1 class="display-3">Anmeldung Ferienpass Seeberg</h1>
+          <div class="bd-callout bd-callout-warning">
+            <h4 class="alert-heading"><i class="fa-solid fa-message"></i>&ensp;Allgemeine Informationen</h4>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li" style="top: revert;"><i class="fa-solid fa-arrow-right"></i></span>Der
+                Anmeldeschluss ist Sonntag, 21. Mai 2023 um 24.00 Uhr.</li>
+              <li><span class="fa-li" style="top: revert;"><i class="fa-solid fa-arrow-right"></i></span>Du kannst dich
+                für all diejenigen Kurse anmelden, welche deiner Klasse im neuen Schuljahr (2023/24) entsprechend
+                ausgeschrieben sind.</li>
+              <li><span class="fa-li" style="top: revert;"><i class="fa-solid fa-arrow-right"></i></span>Falls ein
+                gewünschter Kurs bereits ausgebucht ist, kannst du dich trotzdem anmelden. Du landest dann
+                auf der Warteliste und rutschst automatisch nach, falls ein Platz frei werden sollte oder wir
+                kurzfristig noch mehr Plätze anbieten können.</li>
+              <li><span class="fa-li" style="top: revert;"><i class="fa-solid fa-arrow-right"></i></span>Bitte verwende
+                für alle Familienmitglieder dieselbe E-Mail-Adresse. So können wir sicherstellen, dass
+                die Familienpauschale korrekt berechnet wird.</li>
+            </ul>
+          </div>
+          <h2 class="mb-3 display-6">🏸 Kursangebot
+            <small class="text-body-secondary">in der Woche vom 7. - 11. August 2023</small>
+          </h2>
+
+          <div class="col-sm-9">
+            <input class="form-control form-control-lg no-validate" id="search" type="search"
+              placeholder="Filtern nach Kursbeschreibung oder Wochentag..." />
+          </div>
+          <div class="btn-group col-sm-3">
+            <button id="search-reset-btn" class="btn btn-lg btn-block btn-custom" type="button" disabled>
+              <i class="bi bi-trash"></i>&ensp;Filter zurücksetzen
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Nr.</th>
+                  <th class="w-50" scope="col">Beschreibung</th>
+                  <th scope="col">Details</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="events">
+                <td colspan="5">
+                  <p class="lead"><i class="fa-solid fa-spinner fa-spin"></i>&ensp; Das Kursangebot wird geladen...</p>
+                </td>
+              </tbody>
+            </table>
+          </div>
+
+          <hr class="my-4">
+          <h2 class="mb-3 display-6">🗒️ Anmeldeinformationen</h2>
+
+          <div class="col-sm-6">
+            <label for="firstName" class="form-label">Vorname</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="" required="">
+            <div class="invalid-feedback">
+              Bitte Vorname angeben.
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <label for="lastName" class="form-label">Nachname</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="" required="">
+            <div class="invalid-feedback">
+              Bitte Nachnamen angeben.
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <label for="address" class="form-label">Strasse und Hausnummer</label>
+            <input type="text" class="form-control" id="address" name="address" placeholder="" value="" required="">
+            <div class="invalid-feedback">
+              Bitte Strasse und Hausnummer abgeben.
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="zip" class="form-label">Postleitzahl</label>
+            <input type="text" class="form-control" id="zip" name="zip" pattern="[0-9]{4}" value="" placeholder=""
+              required="">
+            <div class="invalid-feedback">
+              Bitte Postleitzahl angeben.
+            </div>
+          </div>
+
+          <div class="col-sm-9">
+            <label for="city" class="form-label">Ort</label>
+            <input type="text" class="form-control" id="city" name="city" minlength="3" value="" placeholder=""
+              required="">
+            <div class="invalid-feedback">
+              Bitte Wohnort abgeben.
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="email" class="form-label">E-Mail</label>
+            <input type="email" class="form-control" id="email" name="email" value="" placeholder="" required="">
+            <div class="invalid-feedback">
+              Bitte gib eine gültige E-Mail Adresse an.
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="phone" class="form-label">Handynummer</label>
+            <input type="phone" class="form-control" id="phone" name="phone"
+              pattern="[0-9]{3}[\s]?[0-9]{3}[\s]?[0-9]{2}[\s]?[0-9]{2}" value="" placeholder="" required="">
+            <div class="invalid-feedback">
+              Bitte gib eine gültige Telefonnummer im Format '079 999 99 99' an.
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="grade" class="form-label">Klasse (2023/24)</label>
+            <select class="form-select" id="grade" name="grade" required="">
+              <option value="">Bitte Klasse angeben</option>
+              <option value="1">1. Klasse</option>
+              <option value="2">2. Klasse</option>
+              <option value="3">3. Klasse</option>
+              <option value="4">4. Klasse</option>
+              <option value="5">5. Klasse</option>
+              <option value="6">6. Klasse</option>
+              <option value="7">7. Klasse</option>
+              <option value="8">8. Klasse</option>
+              <option value="9">9. Klasse</option>
+            </select>
+            <div class="invalid-feedback">
+              Bitte Klasse angeben.
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="birthday" class="form-label">Geburtsdatum</label>
+            <input type="date" class="form-control" id="birthday" name="birthday" value="" placeholder="" required="">
+            <div class="invalid-feedback">
+              Bitte gib ein gültiges Geburtsdatum an.
+            </div>
+          </div>
+
+          <hr class="my-4">
+          <h2 class="mb-3 display-6">
+            👷🏽 Freiwillige Mithilfe am Sommerfest
+            <small class="text-body-secondary">vom Freitag 11. August 2023</small>
+          </h2>
+
+          <p>Für die Durchführung des Sommerfests sind wir auf deine Mithilfe angewiesen. Ein Einsatz dauert, abhängig
+            von der Anzahl gemeldeter Helferinnen und Helfer, zwischen einer bis maximal drei Stunden. Bei folgenden
+            Arbeiten können wir deine Unterstützung gebrauchen:</p>
+
+          <ol class="list-group list-group-numbered">
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <div class="fw-bold">Festaufbau</div>
+                <small>Du hilfst uns am Freitagnachmittag ab ca. 14.00 Uhr beim Aufbau und Einrichten.</small>
+              </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <div class="fw-bold">Festbetrieb</div>
+                <small>Du hilfst uns während des Festbetriebs am Abend zwischen 18.00 und 22.00 Uhr.</small>
+              </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <div class="fw-bold">Festabbau</div>
+                <small>Du hilfst uns beim Abbau und Aufräumen nach dem Fest ab ca. 22.00 Uhr.</small>
+              </div>
+            </li>
+          </ol>
+
+          <p>Detaillierte Informationen zu deinem gewählten Einsatz erhältst du von uns per E-Mail. Vielen herzlichen
+            Dank für deine Unterstützung 🙏🏻</p>
+
+          <div class="col-sm-6">
+            <label for="volunteering" class="form-label">Art des Einsatzes (optional)</label>
+            <select class="form-select no-validate" id="volunteering" name="volunteering">
+              <option value="">Bitte Einsatzart auswählen</option>
+              <option value="1">Festaufbau</option>
+              <option value="2">Festbetrieb</option>
+              <option value="3">Festabbau</option>
+            </select>
+          </div>
+
+          <div class="col-sm-6">
+            <label for="volunteer" class="form-label">Vor- und Nachname</label>
+            <input type="text" class="form-control no-validate" id="volunteer" name="volunteer" placeholder="">
+          </div>
+
+          <hr class="my-4">
+
+          <div class="col-12">
+            <div class="form-check">
+              <input style="margin-right:1.2em;" class="form-check-input" type="checkbox" value="" id="confirm"
+                required>
+              <label class="form-check-label confirm-label" for="confirm">Ich bestätige hiermit, die oben ausgewählten
+                Kurse verbindlich zu buchen.</label>
+              <div style="margin-left:0.8em;" class="invalid-feedback">
+                Bitte bestätige die verbindliche Buchung der oben ausgewählten Kurse.
+              </div>
+            </div>
+          </div>
+          <div id="alertArea">
+          </div>
+          <button id="submitBtn" class="btn btn-lg btn-custom" type="submit"><i
+              class="fa-regular fa-paper-plane"></i>&ensp;Kurse verbindlich buchen</button>
+        </div>
+      </form>
+    </main>
+
+    <?!= include('theme'); ?>
+
+    <div class="modal fade" id="modal-send" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="d-flex align-items-center">
+              <img src="https://booking.ferienpass-seeberg.ch/ferienpass.webp" alt="Logo Ferienpass Seeberg"
+                style="width: 8em;">
+              <p class="lead" style="margin-left: 1rem; margin-bottom: 0rem;">Deine Daten werden gespeichert... Hab
+                bitte einen kurzen Moment Geduld. 🚚</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modal-success" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="d-flex align-items-center">
+              <img src="https://booking.ferienpass-seeberg.ch/ferienpass.webp" alt="Logo Ferienpass Seeberg"
+                style="width: 8em;">
+              <p class="lead" style="margin-left: 1rem; margin-bottom: 0rem;">Puh... Das hat jetzt aber lange gedauert
+                😅 Vielen Dank für deine Geduld 🙏🏻</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a id="btn-success-redirect" class="btn btn-custom" target="_top" role="button">Hier geht's
+              weiter...</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1"><i class="bi bi-c-circle"></i> 2023 Ferienpass Seeberg</p>
+    <p class="mb-1"><i class="bi bi-question-circle-fill"></i> Bei Problemen mit der Buchung sende uns eine
+      <a href="mailto:<?!= PropertiesService.getScriptProperties().getProperty('EMAIL_FROM_ADDRESS') ?>"
+        class="link-secondary">E-Mail</a>.
+    </p>
+  </footer>
+
+  <?!= include('javascript'); ?>
+</body>
+
+</html>
