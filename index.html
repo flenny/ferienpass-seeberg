@@ -14,6 +14,6 @@
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),
     });
-    iframe.src = `https://script.google.com/macros/s/${GOOGLE_APP_SCRIPS_ID}/exec?action=${params.action ?? 'index'}&reference=${params.reference}&origin=${window.location.origin}`
+    iframe.src = `https://script.google.com/macros/s/${GOOGLE_APP_SCRIPS_ID}/exec?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
   </script>
 </body>
