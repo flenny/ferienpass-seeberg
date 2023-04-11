@@ -11,7 +11,7 @@
     <img class="d-block mx-auto ferienpass-logo" src="https://booking.ferienpass-seeberg.ch/ferienpass-transparent.webp"
       alt="Logo Ferienpass Seeberg">
   </div>
-  <div class="container bg-body-tertiary px-lg-5 py-5 rounded-3 border border-secondary">
+  <div class="container bg-body-tertiary px-md-4 px-lg-5 py-5">
     <main>
       <form id="form" class="needs-validation" novalidate>
         <input type="hidden" id="origin" value="<?!= data.origin ?>" name="origin">
@@ -73,58 +73,62 @@
           <h2 class="mb-3 display-6">🗒️ Anmeldeinformationen</h2>
 
           <div class="col-sm-6">
-            <label for="firstName" class="form-label">Vorname</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="" required="">
+            <label for="firstName" class="form-label">Vorname&ast;</label>
+            <input type="text" class="form-control border border-secondary" id="firstName" name="firstName"
+              placeholder="" value="" required="">
             <div class="invalid-feedback">
               Bitte Vorname angeben.
             </div>
           </div>
 
           <div class="col-sm-6">
-            <label for="lastName" class="form-label">Nachname</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="" required="">
+            <label for="lastName" class="form-label">Nachname&ast;</label>
+            <input type="text" class="form-control border border-secondary" id="lastName" name="lastName" placeholder=""
+              value="" required="">
             <div class="invalid-feedback">
               Bitte Nachnamen angeben.
             </div>
           </div>
 
           <div class="col-sm-12">
-            <label for="address" class="form-label">Strasse und Hausnummer</label>
-            <input type="text" class="form-control" id="address" name="address" placeholder="" value="" required="">
+            <label for="address" class="form-label">Strasse und Hausnummer&ast;</label>
+            <input type="text" class="form-control border border-secondary" id="address" name="address" placeholder=""
+              value="" required="">
             <div class="invalid-feedback">
               Bitte Strasse und Hausnummer abgeben.
             </div>
           </div>
 
           <div class="col-sm-3">
-            <label for="zip" class="form-label">Postleitzahl</label>
-            <input type="text" class="form-control" id="zip" name="zip" pattern="[0-9]{4}" value="" placeholder=""
-              required="">
+            <label for="zip" class="form-label">Postleitzahl&ast;</label>
+            <input type="text" class="form-control border border-secondary" id="zip" name="zip" pattern="[0-9]{4}"
+              value="" placeholder="" required="">
             <div class="invalid-feedback">
               Bitte Postleitzahl angeben.
             </div>
           </div>
 
           <div class="col-sm-9">
-            <label for="city" class="form-label">Ort</label>
-            <input type="text" class="form-control" id="city" name="city" minlength="3" value="" placeholder=""
-              required="">
+            <label for="city" class="form-label">Ort&ast;</label>
+            <input type="text" class="form-control border border-secondary" id="city" name="city" minlength="3" value=""
+              placeholder="" required="">
             <div class="invalid-feedback">
               Bitte Wohnort abgeben.
             </div>
           </div>
 
           <div class="col-sm-3">
-            <label for="email" class="form-label">E-Mail</label>
-            <input type="email" class="form-control" id="email" name="email" value="" placeholder="" required="">
+            <label for="email" class="form-label">E-Mail&ast;</label>
+            <input type="email" class="form-control border border-secondary" id="email" name="email" value=""
+              placeholder="" required="">
             <div class="invalid-feedback">
               Bitte gib eine gültige E-Mail Adresse an.
             </div>
           </div>
 
           <div class="col-sm-3">
-            <label for="phone" class="form-label">Handynummer</label>
-            <input type="phone" class="form-control" id="phone" name="phone"
+            <label for="phone" class="form-label">Handynummer&ast;</label>
+            <input type="phone" class="form-control border border-secondary" id="phone" name="phone"
               pattern="[0-9]{3}[\s]?[0-9]{3}[\s]?[0-9]{2}[\s]?[0-9]{2}" value="" placeholder="" required="">
             <div class="invalid-feedback">
               Bitte gib eine gültige Telefonnummer im Format '079 999 99 99' an.
@@ -132,8 +136,8 @@
           </div>
 
           <div class="col-sm-3">
-            <label for="grade" class="form-label">Klasse (2023/24)</label>
-            <select class="form-select" id="grade" name="grade" required="">
+            <label for="grade" class="form-label">Klasse (2023/24)&ast;</label>
+            <select class="form-select border border-secondary" id="grade" name="grade" required="">
               <option value="">Bitte Klasse angeben</option>
               <option value="1">1. Klasse</option>
               <option value="2">2. Klasse</option>
@@ -151,8 +155,9 @@
           </div>
 
           <div class="col-sm-3">
-            <label for="birthday" class="form-label">Geburtsdatum</label>
-            <input type="date" class="form-control" id="birthday" name="birthday" value="" placeholder="" required="">
+            <label for="birthday" class="form-label">Geburtsdatum&ast;</label>
+            <input type="date" class="form-control border border-secondary" id="birthday" name="birthday" value=""
+              placeholder="" required="">
             <div class="invalid-feedback">
               Bitte gib ein gültiges Geburtsdatum an.
             </div>
@@ -194,7 +199,7 @@
 
           <div class="col-sm-6">
             <label for="volunteering" class="form-label">Art des Einsatzes (optional)</label>
-            <select class="form-select no-validate" id="volunteering" name="volunteering">
+            <select class="form-select no-validate border border-secondary" id="volunteering" name="volunteering">
               <option value="">Bitte Einsatzart auswählen</option>
               <option value="1">Festaufbau</option>
               <option value="2">Festbetrieb</option>
@@ -204,7 +209,8 @@
 
           <div class="col-sm-6">
             <label for="volunteer" class="form-label">Vor- und Nachname</label>
-            <input type="text" class="form-control no-validate" id="volunteer" name="volunteer" placeholder="">
+            <input type="text" class="form-control no-validate border border-secondary" id="volunteer" name="volunteer"
+              placeholder="">
           </div>
 
           <hr class="my-4">
@@ -270,8 +276,7 @@
   <footer class="my-5 pt-5 text-body-secondary text-center text-small">
     <p class="mb-1"><i class="bi bi-c-circle"></i> 2023 Ferienpass Seeberg</p>
     <p class="mb-1"><i class="bi bi-question-circle-fill"></i> Bei Problemen mit der Buchung sende uns eine
-      <a href="mailto:<?!= PropertiesService.getScriptProperties().getProperty('EMAIL_FROM_ADDRESS') ?>"
-        class="link-secondary">E-Mail</a>.
+      <a href="mailto:<?!= PropertiesService.getScriptProperties().getProperty('EMAIL_FROM_ADDRESS') ?>">E-Mail</a>.
     </p>
   </footer>
 

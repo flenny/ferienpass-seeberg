@@ -32,11 +32,11 @@
     if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
     else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
     return `
-    <br class="d-none d-lg-block">
+    <br class="d-none d-md-block">
     <p>
       <small class="d-none d-lg-block">
-        <i class="bi bi-people-fill"></i>&ensp;Max. Teilnehmerzahl: ${participantLimit}<br>
-        <i class="bi bi-pencil-square"></i>&ensp;Anzahl Anmeldungen: ${bookings}<br>
+        <i class="bi bi-people-fill"></i>&ensp;Anzahl Plätze: ${participantLimit}<br>
+        <i class="bi bi-pencil-square"></i>&ensp;Anmeldungen: ${bookings}<br>
         <i class="bi bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
       </small>
       <span class="badge text-bg-${badgeState} bg-${badgeState}">${badgeText}</span>
@@ -66,10 +66,10 @@
       <td>${id}</td>
       <td>
         <label for="event-${id}-input">${name}</label>
-        <p class="d-none d-lg-block"><small>${description}</small></p>
+        <p class="d-none d-md-block"><small>${description}</small></p>
       </td>
       <td>
-        <br class="d-none d-lg-block">
+        <br class="d-none d-md-block">
         <div id="event-${id}-details">
           <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
             <i class="bi bi-calendar"></i>&ensp;${day}, ${date}<br>
@@ -180,7 +180,7 @@
         .processForm([...new FormData(form).entries()])
     }
     else {
-      alert('warning', 'Fehlende Angaben in der Anmeldung', 'Bitte fülle alle Felder aus. Ich habe sie dir oben rot markiert.')
+      alert('warning', 'Fehlende Angaben in der Anmeldung', 'Es fehlen noch Angaben in der Anmeldung. Bitte überprüfe deine Angaben und versuche es erneut.')
       form.classList.add('was-validated')
     }
   }
