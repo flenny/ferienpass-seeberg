@@ -1,10 +1,12 @@
 <script>
   const POLL_INTERVAL = 10000
   const EVENTS_CONTAINER_ELEMENT_ID = 'events'
+  let eventData
 
   const refreshEvents = () => {
     google.script.run.withSuccessHandler(events => {
-      updateEvents(events)
+      eventData = Object.values(events)
+      updateEvents(eventData)
       setTimeout(refreshEvents, POLL_INTERVAL)
     }).getEvents()
   }
@@ -13,12 +15,13 @@
     google.script.run.withSuccessHandler(events => {
       const container = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
       while (container.hasChildNodes()) container.removeChild(container.lastChild)
-      Object.values(events).forEach(event => addEventToForm(event))
+      eventData = Object.values(events)
+      eventData.forEach(event => addEventToForm(event))
     }).getEvents()
   }
 
   const updateEvents = events => {
-    Object.values(events).forEach(event => {
+    events.forEach(event => {
       const [id] = event
       const container = document.getElementById(`event-${id}-status`)
       if (container) container.innerHTML = getEventStatus(event)
@@ -27,7 +30,7 @@
   }
 
   const getEventStatus = event => {
-    const [id, , , , , , , , , , , , participantLimit, bookings, availableSeats] = event
+    const [id, , , , , , , , , , participantLimit, bookings, availableSeats] = event
     let [badgeState, badgeText] = ['success', 'freie Plätze']
     if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
     else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
@@ -35,9 +38,9 @@
     <br class="d-none d-md-block">
     <p>
       <small class="d-none d-lg-block">
-        <i class="bi bi-people-fill"></i>&ensp;Anzahl Plätze: ${participantLimit}<br>
-        <i class="bi bi-pencil-square"></i>&ensp;Anmeldungen: ${bookings}<br>
-        <i class="bi bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
+        <i class="bi-people-fill"></i>&ensp;Anzahl Plätze: ${participantLimit}<br>
+        <i class="bi-pencil-square"></i>&ensp;Anmeldungen: ${bookings}<br>
+        <i class="bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
       </small>
       <span class="badge text-bg-${badgeState} bg-${badgeState}">${badgeText}</span>
     </p>
@@ -45,7 +48,7 @@
   }
 
   const addEventToForm = event => {
-    const [id, name, description, , costs, additionalCosts, day, date, startTime, endTime, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
+    const [id, name, description, , costs, additionalCosts, start, end, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
     const events = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
 
     // Create a string to display the costs of the event
@@ -53,6 +56,11 @@
     if (costs + additionalCosts <= 0) costsDisplaySring = 'gratis'
     else if (additionalCosts === 0) costsDisplaySring = `${costs} CHF`
     else costsDisplaySring = `${costs} CHF (+ ${additionalCosts} CHF)`
+
+    const weekday = new Date(start).toLocaleDateString('de-CH', { weekday: 'long' })
+    const date = new Date(start).toLocaleDateString('de-CH', { day: 'numeric', month: 'long' })
+    const from = new Date(start).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
+    const to = new Date(end).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
 
     // Create meta data which is used to filter the events by grade
     const gradeMetaData = []
@@ -72,10 +80,10 @@
         <br class="d-none d-md-block">
         <div id="event-${id}-details">
           <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
-            <i class="bi bi-calendar"></i>&ensp;${day}, ${date}<br>
-            <i class="bi bi-clock"></i>&ensp;${startTime} - ${endTime} Uhr<br>
-            <i class="bi bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
-            <i class="bi bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
+            <i class="bi-calendar"></i>&ensp;${weekday}, ${date}<br>
+            <i class="bi-clock"></i>&ensp;${from} - ${to} Uhr<br>
+            <i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
+            <i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
           </p>
         </div>
       </td>
@@ -141,8 +149,10 @@
       return
     }
 
-    // Check if selected events match the selected grade
+    let valid = true
     const selectedEvents = [...new FormData(form).getAll('eventId')]
+
+    // Validate if selected events match the selected grade
     const selectedGrade = document.getElementById('grade').value
     const nonMatchingEvents = []
     selectedEvents.forEach(id => {
@@ -151,8 +161,29 @@
     })
     if (nonMatchingEvents.length > 0) {
       alert('warning', 'Ungültige Kurse', `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt, die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
-      return
+      valid = false
     }
+
+    // Validate if selected events do not overlap in time
+    const overlappingEvents = []
+    selectedEvents.forEach(eventId1 => {
+      const [, , , , , , start, end] = eventData.find(e => e[0] == eventId1)
+      const event1Start = new Date(start)
+      const event1End = new Date(end)
+      selectedEvents.forEach(eventId2 => {
+        if (eventId1 === eventId2) return
+        const [, , , , , , start, end] = eventData.find(e => e[0] == eventId2)
+        const event2Start = new Date(start)
+        const event2End = new Date(end)
+        if (event1Start < event2End && event1End > event2Start) overlappingEvents.push(eventId1)
+      })
+    })
+    if (overlappingEvents.length > 0) {
+      alert('warning', 'Überlappende Kurse', `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt, die zeitgleich stattfinden: ${overlappingEvents.join(', ')}`)
+      valid = false
+    }
+
+    if (!valid) return
 
     const modalDialogSend = new bootstrap.Modal('#modal-send')
     const modalDialogSuccess = new bootstrap.Modal('#modal-success')
