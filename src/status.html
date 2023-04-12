@@ -13,14 +13,16 @@
   </div>
   <div class="container container-sm bg-body-tertiary px-lg-5 py-5">
     <main>
-      <div class="text-center">
-        <h1 class="display-3">Deine gebuchten Kurse</h1>
+      <div>
+        <h1 class="display-3 text-center">Deine gebuchten Kurse</h1>
         <input type="hidden" id="reference" value="<?!= data.reference ?>">
-        <table class="table table-responsive table-sm" style="max-width: 35em; display: inline-table;">
+        <table class="table table-responsive table-sm">
           <thead>
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Kurs</th>
+              <th scope="col">Treffpunkt</th>
+              <th class="d-none d-sm-table-cell" scope="col">Zuständig</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -44,13 +46,14 @@
       .withSuccessHandler(bookings => {
         Object.values(bookings).forEach(booking => {
           const tableRow = document.createElement('tr')
-          const [, , , firstName, lastName, , , , , , , , eventName, , , waitingList] = booking
+          const [, , , firstName, lastName, , , , , , , , eventName, meetingPoint, , , personResponsible, phoneResponsible, waitingList] = booking
           const [badgeState, badgeText] = (waitingList === 'Nein') ? ['success', 'angemeldet'] : ['danger', 'auf Warteliste']
+          const responsible = (personResponsible === '') ? '' : `${personResponsible} (${phoneResponsible})`
           const row = `
             <td>${firstName} ${lastName}</td>
-            <td>
-              <label>${eventName}</label>
-            </td>
+            <td> <label>${eventName}</label></td>
+            <td>${meetingPoint}</td>
+            <td class="d-none d-sm-table-cell">${responsible}</td>
             <td><span class="badge bg-${badgeState}">${badgeText}</span></td>
           `
           tableRow.innerHTML = row

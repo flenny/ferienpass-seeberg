@@ -9,7 +9,10 @@ const TIMESTAMP_FORMAT = 'dd.MM.yyyy HH:mm:ss'
 const TIME_ZONE = 'Europe/Zurich'
 const EVENTS_SHEET_ID_COLUMN = 'A:A'
 const EVENTS_SHEET_NAME_COLUMN = 'B:B'
+const EVENTS_SHEET_MEETING_POINT_COLUMN = 'D:D'
 const EVENTS_SHEET_COSTS_COLUMN = 'E:E'
+const EVENTS_SHEET_PERSON_RESPONSIBLE_COLUMN = 'O:O'
+const EVENTS_SHEET_PHONE_RESPONSIBLE_COLUMN = 'P:P'
 const EVENTS_SHEET_ADDITIONAL_COSTS_COLUMN = 'F:F'
 const EVENTS_SHEET_PARTICIPANT_LIMIT_COLUMN = 'K:K'
 const BOOKINGS_SHEET_EVENT_ID_COLUMN = 'L'
@@ -97,9 +100,12 @@ function processForm(formObject) {
         else if (header === 'phone') return phone
         else if (header === 'grade') return `${formObject.find(entry => entry[0] === 'grade')?.[1]}. Klasse`
         else if (header === 'eventName') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_NAME_COLUMN},"")`
+        else if (header === 'meetingPoint') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_MEETING_POINT_COLUMN},"")`
         else if (header === 'waitingList') return `=IF((XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_PARTICIPANT_LIMIT_COLUMN},""))-(COUNTIF(${BOOKINGS_SHEET_EVENT_ID_COLUMN}2:INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())))) < 0, "Ja", "Nein")`
         else if (header === 'costs') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_COSTS_COLUMN},"")`
         else if (header === 'additionalCosts') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ADDITIONAL_COSTS_COLUMN},"")`
+        else if (header === 'personResponsible ') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_PERSON_RESPONSIBLE_COLUMN},"")`
+        else if (header === 'phoneResponsible ') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_PHONE_RESPONSIBLE_COLUMN},"")`
         else if (header === 'allowParticipantList') return formObject.find(entry => entry[0] === 'allowParticipantList')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'allowPhotos') return formObject.find(entry => entry[0] === 'allowPhotos')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'reference') return reference
@@ -140,8 +146,9 @@ function processForm(formObject) {
       <body style="font-size: 16px;">
         <img src="https://booking.ferienpass-seeberg.ch/ferienpass.webp" alt="Logo Ferienpass Seeberg" style="max-width: 12em;">
         <p style="font-size: 20px;">Hallo ${firstName} 👋🏻<p>
-        <p>Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Du kannst
-        <a href="${getStatusUrl(origin, reference)}">hier</a> jederzeit
+        <p>Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Wir freuen uns sehr, dass du
+        dabei bist 🥳.</p>
+        <p>Du kannst <a href="${getStatusUrl(origin, reference)}">hier</a> jederzeit
         den Status deiner gebuchten Kurse überprüfen. Die Rechnung, unter Berücksichtigung
         der im Programmheft beschriebenen Familienpauschale, erhältst du nach Anmeldeschluss.</p>
         <p><a href="${getPreFilledFormUrl(origin, bookingId)}" target="_top">Hier</a> kannst du weitere Kurse buchen.</p>
@@ -154,8 +161,9 @@ function processForm(formObject) {
     const textBody = `
       Hallo ${firstName}
 
-      Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Unter dem nachfolgenden
-      Link kannst du jederzeit den Status deiner gebuchten Kurse ueberpruefen.
+      Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Wir freuen uns sehr, dass du dabei bist.
+
+      Unter dem nachfolgenden Link kannst du jederzeit den Status deiner gebuchten Kurse ueberpruefen.
 
       ${getStatusUrl(origin, reference)}
 
