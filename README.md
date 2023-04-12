@@ -20,6 +20,38 @@ The registration form is primarily designed to allow parents to book courses for
 - A registration form for parents to book courses for their children
 - An administration interface (Google Spreadsheet) to manage the courses, registrations and volunteers
 
+## Getting Started
+
+### Prerequisites
+
+Before you start, make sure you have the following installed on your machine:
+
+- Docker: You can download and install Docker from the official website at https://www.docker.com/.
+- Visual Studio Code: You can download and install VS Code from the official website at https://code.visualstudio.com/.
+
+### Development
+
+1. Clone the ferienpass-seeberg project from GitHub to your local machine using Git or any other method you prefer. You can use the following command in your terminal or command prompt:
+
+    ```bash
+    git clone https://github.com/flenny/ferienpass-seeberg.git
+    ```
+
+1. Navigate to the ferienpass-seeberg project directory and open the project with VS Code. After that, VS Code is requesting to reopen the project in the pre-defined Docker Dev-Container.
+
+    ```bash
+    cd ferienpass-seeberg
+    code .
+    ```
+
+1. The 'src' directory contains the Apps Script project files. clasp cli is already installed in the Docker container. If you haven't authenticated with Google using clasp in the Docker container yet, you need to do it once. Run the following command to authenticate:
+
+    ```bash
+    clasp login
+    ```
+
+1. Now use clasp commands to manage the Apps Script project. For example, you can use `clasp push` to push your local changes to the Apps Script project, and `clasp pull` to pull the latest changes from the Apps Script project to your local machine.
+
 ## Contributing
 
 We welcome contributions to the ferienpass-seeberg repository! If you find a bug or have a feature request, please open an issue on the repository.
