@@ -100,6 +100,8 @@ function processForm(formObject) {
         else if (header === 'waitingList') return `=IF((XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_PARTICIPANT_LIMIT_COLUMN},""))-(COUNTIF(${BOOKINGS_SHEET_EVENT_ID_COLUMN}2:INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())))) < 0, "Ja", "Nein")`
         else if (header === 'costs') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_COSTS_COLUMN},"")`
         else if (header === 'additionalCosts') return `=XLOOKUP(INDIRECT(CONCATENATE("${BOOKINGS_SHEET_EVENT_ID_COLUMN}",ROW())),${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ID_COLUMN},${EVENTS_SHEET_NAME}!${EVENTS_SHEET_ADDITIONAL_COSTS_COLUMN},"")`
+        else if (header === 'allowParticipantList') return formObject.find(entry => entry[0] === 'allowParticipantList')?.[1] ? 'Ja' : 'Nein'
+        else if (header === 'allowPhotos') return formObject.find(entry => entry[0] === 'allowPhotos')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'reference') return reference
         else if (header === 'url') return getStatusUrl(origin, reference)
         else return formObject.find(entry => entry[0] === header)?.[1]
