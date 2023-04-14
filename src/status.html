@@ -22,7 +22,7 @@
               <th scope="col">Name</th>
               <th scope="col">Kurs</th>
               <th scope="col">Treffpunkt</th>
-              <th class="d-none d-sm-table-cell" scope="col">Zuständig</th>
+              <th class="d-none d-sm-table-cell" scope="col">Kontaktperson</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -51,7 +51,7 @@
           const responsible = (personResponsible === '') ? '' : `${personResponsible} (${phoneResponsible})`
           const row = `
             <td>${firstName} ${lastName}</td>
-            <td> <label>${eventName}</label></td>
+            <td> <label class="form-label">${eventName}</label></td>
             <td>${meetingPoint}</td>
             <td class="d-none d-sm-table-cell">${responsible}</td>
             <td><span class="badge bg-${badgeState}">${badgeText}</span></td>

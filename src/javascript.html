@@ -1,7 +1,28 @@
 <script>
   const POLL_INTERVAL = 10000
-  const EVENTS_CONTAINER_ELEMENT_ID = 'events'
+  const LOCALES_INDENTIFIER = 'de-CH'
+  const EVENTS_TABLE_ID = 'events'
+
+  // raw event data
   let eventData
+
+  const setupDataTable = () => new DataTable(`#${EVENTS_TABLE_ID}`, {
+    lengthChange: false,
+    pageLength: 6,
+    order: [[1, 'asc']],
+    language: {
+      "paginate": {
+        "next": "<i class=\"fa-solid fa-angles-right\"></i>",
+        "previous": "<i class=\"fa-solid fa-angles-left\"></i>"
+      },
+      "infoFiltered": "",
+      "infoEmpty": "",
+      "search": "",
+      "searchPlaceholder": "Suchen...",
+      "zeroRecords": "Es wurden leider keine Kurse gefunden.",
+      "info": "_START_ bis _END_ von _TOTAL_ Kursen",
+    }
+  })
 
   const refreshEvents = () => {
     google.script.run.withSuccessHandler(events => {
@@ -13,17 +34,18 @@
 
   const populateData = () => {
     google.script.run.withSuccessHandler(events => {
-      const container = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
-      while (container.hasChildNodes()) container.removeChild(container.lastChild)
+      const tbody = document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
+      while (tbody.hasChildNodes()) tbody.removeChild(tbody.lastChild)
       eventData = Object.values(events)
       eventData.forEach(event => addEventToForm(event))
+      setupDataTable()
     }).getEvents()
   }
 
   const updateEvents = events => {
     events.forEach(event => {
       const [id] = event
-      const container = document.getElementById(`event-${id}-status`)
+      const container = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-status`)
       if (container) container.innerHTML = getEventStatus(event)
       else addEventToForm(event)
     })
@@ -49,7 +71,11 @@
 
   const addEventToForm = event => {
     const [id, name, description, , costs, additionalCosts, start, end, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
-    const events = document.getElementById(EVENTS_CONTAINER_ELEMENT_ID)
+
+    // Distinguish between the table body and the DataTable object
+    const events = DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ?
+      $(`#${EVENTS_TABLE_ID}`).DataTable() :
+      document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
 
     // Create a string to display the costs of the event
     let costsDisplaySring = ''
@@ -57,44 +83,52 @@
     else if (additionalCosts === 0) costsDisplaySring = `${costs} CHF`
     else costsDisplaySring = `${costs} CHF (+ ${additionalCosts} CHF)`
 
-    const weekday = new Date(start).toLocaleDateString('de-CH', { weekday: 'long' })
-    const date = new Date(start).toLocaleDateString('de-CH', { day: 'numeric', month: 'long' })
-    const from = new Date(start).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
-    const to = new Date(end).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
+    // Format the date and time
+    const weekday = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { weekday: 'long' })
+    const date = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { day: 'numeric', month: 'long' })
+    const from = new Date(start).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
+    const to = new Date(end).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
 
     // Create meta data which is used to filter the events by grade
     const gradeMetaData = []
     for (let i = gradeFrom; i <= gradeTo; i++) gradeMetaData.push(`grade-${i}`)
 
+    // Replace letters in the event id with numbers to make it sortable
+    const orderableEventId = id.toString().replace(/[a-z]/g, c => `.${c.charCodeAt(0) - 87}`)
+
+    // Replace the weekday with a number to make it sortable
+    const orderableWeekday = new Date(start).getDay()
+
     const result = `
-    <tr>
-      <td>
-        <input id="event-${id}-input" class="fa-checkbox-square" type="checkbox" name="eventId" value="${id}">
-      </td>
-      <td class="d-none d-sm-table-cell">${id}</td>
-      <td>
-        <label for="event-${id}-input">${name}</label>
-        <p class="d-none d-md-block"><small>${description}</small></p>
-      </td>
-      <td>
-        <br class="d-none d-md-block">
-        <div id="event-${id}-details">
-          <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
-            <i class="bi-calendar"></i>&ensp;${weekday}, ${date}<br>
-            <i class="bi-clock"></i>&ensp;${from} - ${to} Uhr<br>
-            <i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
-            <i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
-          </p>
-        </div>
-      </td>
-      <td>
-        <div id="event-${id}-status">
-          ${getEventStatus(event)}
-        </div>
-      </td>
-    </tr>
-  `
-    events.insertAdjacentHTML('beforeend', result)
+      <tr>
+        <td>
+          <input id="event-${id}-input" class="fa-checkbox-square" type="checkbox" name="eventId" value="${id}">
+        </td>
+        <td class="d-none d-sm-table-cell" data-order="${orderableEventId}">${id}</td>
+        <td>
+          <label class="form-label" for="event-${id}-input">${name}</label>
+          <p class="d-none d-md-block"><small>${description}</small></p>
+        </td>
+        <td data-order="${orderableWeekday}">
+          <br class="d-none d-md-block">
+          <div id="event-${id}-details">
+            <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
+              <i class="bi-calendar"></i>&ensp;${weekday}, ${date}<br>
+              <i class="bi-clock"></i>&ensp;${from} - ${to} Uhr<br>
+              <i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
+              <i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
+            </p>
+          </div>
+        </td>
+        <td>
+          <div id="event-${id}-status">
+            ${getEventStatus(event)}
+          </div>
+        </td>
+      </tr>
+    `
+    // If the DataTable object exists, add the event to the table, otherwise append it to the table body
+    DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ? events.row.add($(result)) : events.insertAdjacentHTML('beforeend', result)
   }
 
   const alertArea = document.getElementById('alertArea')
@@ -113,59 +147,57 @@
     `
     alertArea.append(wrapper)
 
-    // Wait 15 seconds before clearing the alert
-    await new Promise(r => setTimeout(r, 15000));
+    // Wait 20 seconds before clearing the alert
+    await new Promise(r => setTimeout(r, 20000));
     clearAlert(id)
   }
-
-  $("#search-reset-btn").click(function () {
-    document.getElementById('search').value = ''
-    $("#events tr").filter(function () { $(this).toggle(true) });
-    $(this).prop('disabled', true)
-  })
-
-  $("#search").on("input propertychange paste", function () {
-    var words = $(this).val().toLowerCase().trim().split(' ').filter(e => String(e).trim());
-    const resetBtn = document.getElementById('search-reset-btn')
-    resetBtn.disabled = true
-    if (words.length > 0) {
-      resetBtn.disabled = false
-    }
-
-    $("#events tr").filter(function () {
-      const searchText = $(this).text().toLowerCase()
-      $(this).toggle(words.every(word => searchText.indexOf(word) > -1))
-    });
-  })
 
   form.onsubmit = async e => {
     e.preventDefault()
     e.stopPropagation()
     clearAllAlerts()
 
+    // Get selected events from events datatable
+    const selectedEvents = []
+    $(`#${EVENTS_TABLE_ID}`).DataTable()
+      .$('input[name="eventId"]:checked').each(function () {
+        selectedEvents.push($(this).val());
+      })
+
     // Check for at least one event
-    if (!new FormData(form).has('eventId')) {
-      alert('warning', 'Unvollständige Anmeldung', 'Bitte wähle mindestens einen (1) Kurs aus. Es sollte für jeden und jede etwas spannendes dabei sein.')
+    if (selectedEvents.length === 0) {
+      alert(
+        'warning',
+        'Unvollständige Anmeldung',
+        'Bitte wähle mindestens einen (1) Kurs aus. Es sollte für jeden und jede etwas spannendes dabei sein.')
       return
     }
 
-    let valid = true
-    const selectedEvents = [...new FormData(form).getAll('eventId')]
-
     // Validate if selected events match the selected grade
     const selectedGrade = document.getElementById('grade').value
-    const nonMatchingEvents = []
+    let nonMatchingEvents = []
     selectedEvents.forEach(id => {
-      const eventMetaData = document.getElementById(`event-${id}-details`).outerHTML
+      const eventMetaData = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-details`)[0].outerHTML
       !eventMetaData.includes(`grade-${selectedGrade}`) && nonMatchingEvents.push(id)
     })
+
+    // Remove duplicates and sort alphanumeric keys
+    nonMatchingEvents = nonMatchingEvents
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
+
+    // Show alert if there are events that do not match the selected grade
     if (nonMatchingEvents.length > 0) {
-      alert('warning', 'Ungültige Kurse', `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt, die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
-      valid = false
+      alert(
+        'warning',
+        'Ungültige Kurse',
+        `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt,
+        die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
+      return
     }
 
     // Validate if selected events do not overlap in time
-    const overlappingEvents = []
+    let overlappingEvents = []
     selectedEvents.forEach(eventId1 => {
       const [, , , , , , start, end] = eventData.find(e => e[0] == eventId1)
       const event1Start = new Date(start)
@@ -178,17 +210,30 @@
         if (event1Start < event2End && event1End > event2Start) overlappingEvents.push(eventId1)
       })
     })
-    if (overlappingEvents.length > 0) {
-      alert('warning', 'Überlappende Kurse', `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt, die zeitgleich stattfinden: ${overlappingEvents.join(', ')}`)
-      valid = false
-    }
 
-    if (!valid) return
+    // Remove duplicates and sort alphanumeric keys
+    overlappingEvents = overlappingEvents
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
+
+    // Show alert if there are overlapping events
+    if (overlappingEvents.length > 0) {
+      alert(
+        'warning',
+        'Überlappende Kurse',
+        `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt,
+        die zeitgleich stattfinden: ${overlappingEvents.join(', ')}`)
+      return
+    }
 
     const modalDialogSend = new bootstrap.Modal('#modal-send')
     const modalDialogSuccess = new bootstrap.Modal('#modal-success')
 
     if (form.checkValidity()) {
+      const formData = new FormData(form)
+      formData.delete('eventId')
+      selectedEvents.forEach(id => formData.append('eventId', id))
+
       modalDialogSend.show()
       google.script.run
         .withFailureHandler(error => {
@@ -208,7 +253,7 @@
             modalDialogSuccess.show()
           }
         })
-        .processForm([...new FormData(form).entries()])
+        .processForm([...formData.entries()])
     }
     else {
       alert('warning', 'Fehlende Angaben in der Anmeldung', 'Es fehlen noch Angaben in der Anmeldung. Bitte überprüfe deine Angaben und versuche es erneut.')
@@ -223,6 +268,7 @@
   if (bookingId) {
     google.script.run
       .withSuccessHandler(bookings => {
+        if (bookings.length === 0) return
         const booking = Object.values(bookings).pop()
         const [, , email, , , phone, address, zip, city] = booking
         document.getElementById('email').value = email

@@ -40,28 +40,18 @@
             <small class="text-body-secondary">in der Woche vom 7. - 11. August 2023</small>
           </h2>
 
-          <div class="col-sm-9">
-            <input class="form-control form-control no-validate" id="search" type="search"
-              placeholder="Filtern nach Kursbeschreibung oder Wochentag..." />
-          </div>
-          <div class="btn-group col-sm-3">
-            <button id="search-reset-btn" class="btn btn btn-block btn-custom" type="button" disabled>
-              <i class="bi-trash"></i>&ensp;Filter zurücksetzen
-            </button>
-          </div>
-
           <div class="table-responsive">
-            <table class="table table-hover">
+            <table id="events" class="table table-hover">
               <thead>
                 <tr>
-                  <th></th>
+                  <th data-orderable="false"></th>
                   <th class="d-none d-sm-table-cell">Nr.</th>
                   <th class="w-50" scope="col">Beschreibung</th>
                   <th scope="col">Details</th>
-                  <th scope="col">Status</th>
+                  <th scope="col" data-orderable="false">Status</th>
                 </tr>
               </thead>
-              <tbody id="events">
+              <tbody>
                 <td colspan="5">
                   <p class="lead"><i class="fa-solid fa-spinner fa-spin"></i>&ensp; Das Kursangebot wird geladen...</p>
                 </td>
@@ -219,10 +209,10 @@
             <div class="form-check">
               <input style="margin-right:1.2em;" class="form-check-input" type="checkbox" value="" id="confirm"
                 required>
-              <label class="form-check-label confirm-label" for="confirm">Ich bestätige hiermit, die oben ausgewählten
+              <label class="form-check-label confirm-label" for="confirm">Ich bestätige hiermit, die ausgewählten
                 Kurse verbindlich zu buchen.<span class="highlight">&ast;</span></label>
               <div style="margin-left:0.8em;" class="invalid-feedback">
-                Bitte bestätige die verbindliche Buchung der oben ausgewählten Kurse.
+                Bitte bestätige die verbindliche Buchung der ausgewählten Kurse.
               </div>
             </div>
           </div>
@@ -253,7 +243,7 @@
                 id="allowPhotos" name="allowPhotos">
               <label class="form-check-label confirm-label no-validate" for="allowPhotos">Ich bin damit einverstanden,
                 dass von mir während des Kurses Bilder gemacht werden, welche anschliessend in der Fotostrecke auf
-                ferienpass-seeberg.ch veröffentlicht werden.</label>
+                ferienpass-seeberg.ch veröffentlicht werden und am Sommerfest an einer Foto-Show gezeigt werden.</label>
             </div>
           </div>
 
@@ -307,7 +297,7 @@
   <footer class="my-5 pt-5 text-body-secondary text-center text-small">
     <p class="mb-1"><i class="bi bi-c-circle"></i> 2023 Ferienpass Seeberg</p>
     <p class="mb-1"><i class="bi bi-question-circle-fill"></i> Bei Problemen mit der Buchung sende uns eine
-      <a href="mailto:<?!= PropertiesService.getScriptProperties().getProperty('EMAIL_FROM_ADDRESS') ?>">E-Mail</a>.
+      <a href="mailto:<?!= PropertiesService.getScriptProperties().getProperty('EMAIL_SUPPORT_REQUESTS') ?>">E-Mail</a>.
     </p>
   </footer>
 
