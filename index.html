@@ -11,13 +11,6 @@
   <!-- Include SHA-256 library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <!-- Include CryptoJS library -->
-  <script>
-    // Load iframe if src was decrpyted previously and stored in localStorage
-    if (localStorage.getItem("iframeSrc")) {
-      document.getElementById("iframe").src = `${localStorage.getItem("iframeSrc")}${window.location.search}`;
-      document.getElementById("iframe").style.display = "block";
-    }
-  </script>
 </head>
 
 <body>
@@ -39,30 +32,33 @@
     style="display:none; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
 
   <script>
+    // Get search params from URL
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    })
+
+    // Get iframe src for given base URL
+    const getIframeSrc = baseUrl => `${baseUrl}?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
+
     // Load iframe if src was decrpyted previously and stored in localStorage
     if (localStorage.getItem("iframeSrc")) {
-      document.getElementById("iframe").src = `${localStorage.getItem("iframeSrc")}${window.location.search}`;
-      document.getElementById("iframe").style.display = "block";
+      document.getElementById("iframe").src = getIframeSrc(localStorage.getItem("iframeSrc"))
+      document.getElementById("iframe").style.display = "block"
     }
     else {
       // Show the login form
-      document.getElementById("form").style.display = "block";
+      document.getElementById("form").style.display = "block"
     }
 
     form.onsubmit = async e => {
       e.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
 
-      // Check if username and password are not empty
-      if (username === "" || password === "") {
-        alert("Please enter both username and password.");
-        return false;
-      }
+      const username = document.getElementById("username").value
+      const password = document.getElementById("password").value
 
       // Hash username and password using SHA-256
-      const hashedUsername = sha256(username);
-      const hashedPassword = sha256(password);
+      const hashedUsername = sha256(username)
+      const hashedPassword = sha256(password)
 
       // Check if username is "ferienpass" and hashed password matches the expected hash
       if (hashedUsername.localeCompare("2F149CB830D6DAF68B1BFF7B8F29B01B8CC85D1CB7C87FE06D51FE3CD6367ED7", undefined, { sensitivity: 'accent' }) === 0 &&
@@ -74,17 +70,17 @@
             `${username}:${password}`).toString()
         )*/
         const encryptedSrc = "U2FsdGVkX19iWxcFbeZ0E9GgZVoIWY4HroevSbOYcraghQzZIa3EMauMOgIKb5kruYs8gQIC3z194oyF65SaRWtG82hKpmuN4eJ0SCTyuDWK/WSZ4FAAKJuiY/QGQLhQ+hNmA2Nnic5oJDjLKoAK32rmW1i9YK74WihPFEkzoSpvfBFehAoLl4QrlJnQ93Yn"
-        const decryptedSrc = CryptoJS.AES.decrypt(encryptedSrc, `${username}:${password}`).toString(CryptoJS.enc.Utf8);
+        const decryptedSrc = CryptoJS.AES.decrypt(encryptedSrc, `${username}:${password}`).toString(CryptoJS.enc.Utf8)
 
         // Save decrypted src to local storage
-        localStorage.setItem("iframeSrc", decryptedSrc);
-
-        // Show the iframe
-        document.getElementById("iframe").style.display = "block";
+        localStorage.setItem("iframeSrc", decryptedSrc)
 
         // Set the decrypted src as the iframe source
         // Append the original query string to the decrypted src
-        document.getElementById("iframe").src = `${decryptedSrc}${window.location.search}`;
+        document.getElementById("iframe").src = getIframeSrc(decryptedSrc)
+
+        // Show the iframe
+        document.getElementById("iframe").style.display = "block"
       }
     }
   </script>
