@@ -4,30 +4,66 @@
 <head>
   <title>Ferienpass Seeberg - Anmeldung Ferienpass</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/sign-in/">
   <link rel="shortcut icon" type="image/png" href="https://booking.ferienpass-seeberg.ch/ferienpass.webp">
-  <!-- Include Bootstrap 5.3 Alpha 2 CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://getbootstrap.com/docs/5.0/examples/sign-in/signin.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
   <!-- Include SHA-256 library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <!-- Include CryptoJS library -->
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+
+    .form-signin input[type="text"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  </style>
 </head>
 
-<body>
-  <div class="container mt-5">
-    <form id="form" class="mt-4" style="display: none;">
-      <h1 class="text-center">Ferienpass Seeberg - Anmeldung Ferienpass</h1>
-      <div class="mb-3">
-        <label for="username" class="form-label">Username:</label>
-        <input type="text" class="form-control" id="username" name="username" autocomplete="username">
+<body class="text-center" style="background-color: darkseagreen;">
+  <main class="form-signin">
+    <form id="form" style="display: none;">
+      <img class="mb-4 w-100" src="https://booking.ferienpass-seeberg.ch/ferienpass-transparent.webp"
+        alt="Logo Ferienpass Seeberg">
+      <h1 class="h3 mb-3 fw-normal">Bitte anmelden</h1>
+
+      <div class="form-floating">
+        <input type="text" class="form-control" id="username" placeholder="Benutzername" autocomplete="username"
+          required>
+        <label for="username">Benutzername</label>
       </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password:</label>
-        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password">
+      <div class="form-floating">
+        <input type="password" class="form-control" id="password" placeholder="Passwort" autocomplete="current-password"
+          required>
+        <label for="password">Passwort</label>
       </div>
-      <button type="submit" class="btn btn-primary">Login</button>
+      <div id="error" class="p-1 text-danger-emphasis bg-danger-subtle border border-danger-subtle rounded-3 mb-2"
+        style="display: none;">
+        Leider nicht richtig 🤷🏼‍♂️
+      </div>
+      <button class="w-100 btn btn-lg btn-dark" type="submit">Anmelden</button>
+      <p class="mt-5 mb-3 text-muted">&copy; 2023 Ferienpass Seeberg</p>
     </form>
-  </div>
+  </main>
   <iframe id="iframe"
     style="display:none; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
 
@@ -60,15 +96,20 @@
       const hashedUsername = sha256(username)
       const hashedPassword = sha256(password)
 
-      // Check if username is "ferienpass" and hashed password matches the expected hash
+      // Check if username and hashed password matches the expected hashes
       if (hashedUsername.localeCompare("2F149CB830D6DAF68B1BFF7B8F29B01B8CC85D1CB7C87FE06D51FE3CD6367ED7", undefined, { sensitivity: 'accent' }) === 0 &&
         hashedPassword.localeCompare("1CB14D3982F507A7AF9F3337D4283F253F62B84EA65EFB2F32E913D07D80072C", undefined, { sensitivity: 'accent' }) === 0) {
-        // Encrypt the iframe src using the password
-        /*console.log(
+
+        /**
+          // Encrypt the iframe src using the password
+          // Uncomment the following lines to generate a new encrypted src
+          // and replace the encryptedSrc variable below with the output
+          console.log(
           CryptoJS.AES.encrypt(
             "https://www.example.com",
-            `${username}:${password}`).toString()
-        )*/
+            `${username}:${password}`).toString())
+        */
+
         const encryptedSrc = "U2FsdGVkX19iWxcFbeZ0E9GgZVoIWY4HroevSbOYcraghQzZIa3EMauMOgIKb5kruYs8gQIC3z194oyF65SaRWtG82hKpmuN4eJ0SCTyuDWK/WSZ4FAAKJuiY/QGQLhQ+hNmA2Nnic5oJDjLKoAK32rmW1i9YK74WihPFEkzoSpvfBFehAoLl4QrlJnQ93Yn"
         const decryptedSrc = CryptoJS.AES.decrypt(encryptedSrc, `${username}:${password}`).toString(CryptoJS.enc.Utf8)
 
@@ -81,6 +122,10 @@
 
         // Show the iframe
         document.getElementById("iframe").style.display = "block"
+      }
+      else {
+        // Show error message
+        document.getElementById("error").style.display = "block"
       }
     }
   </script>

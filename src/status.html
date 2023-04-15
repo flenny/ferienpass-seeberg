@@ -21,8 +21,7 @@
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Kurs</th>
-              <th scope="col">Treffpunkt</th>
-              <th class="d-none d-sm-table-cell" scope="col">Kontaktperson</th>
+              <th class="d-none d-sm-table-cell" scope="col">Treffpunkt</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -52,8 +51,7 @@
           const row = `
             <td>${firstName} ${lastName}</td>
             <td> <label class="form-label">${eventName}</label></td>
-            <td>${meetingPoint}</td>
-            <td class="d-none d-sm-table-cell">${responsible}</td>
+            <td class="d-none d-sm-table-cell">${meetingPoint}</td>
             <td><span class="badge bg-${badgeState}">${badgeText}</span></td>
           `
           tableRow.innerHTML = row
