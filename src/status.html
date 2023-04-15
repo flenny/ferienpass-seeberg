@@ -20,8 +20,9 @@
           <thead>
             <tr>
               <th scope="col">Name</th>
+              <th class="d-none d-sm-table-cell" scope="col">Nr.</th>
               <th scope="col">Kurs</th>
-              <th class="d-none d-sm-table-cell" scope="col">Treffpunkt</th>
+              <th class="d-none d-sm-table-cell" scope="col">Ort</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -45,11 +46,12 @@
       .withSuccessHandler(bookings => {
         Object.values(bookings).forEach(booking => {
           const tableRow = document.createElement('tr')
-          const [, , , firstName, lastName, , , , , , , , eventName, meetingPoint, , , personResponsible, phoneResponsible, waitingList] = booking
+          const [, , , firstName, lastName, , , , , , , eventId, eventName, meetingPoint, , , personResponsible, phoneResponsible, waitingList] = booking
           const [badgeState, badgeText] = (waitingList === 'Nein') ? ['success', 'angemeldet'] : ['danger', 'auf Warteliste']
           const responsible = (personResponsible === '') ? '' : `${personResponsible} (${phoneResponsible})`
           const row = `
             <td>${firstName} ${lastName}</td>
+            <td class="d-none d-sm-table-cell">${eventId}</td>
             <td> <label class="form-label">${eventName}</label></td>
             <td class="d-none d-sm-table-cell">${meetingPoint}</td>
             <td><span class="badge bg-${badgeState}">${badgeText}</span></td>

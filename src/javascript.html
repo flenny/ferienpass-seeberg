@@ -87,7 +87,9 @@
 
       // Format the date and time
       const weekday = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { weekday: 'long' })
+      const weekdayShort = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { weekday: 'short' })
       const date = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { day: 'numeric', month: 'long' })
+      const dateShort = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { day: 'numeric', month: 'short' })
       const from = new Date(start).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
       const to = new Date(end).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
 
@@ -115,9 +117,11 @@
           <br class="d-none d-md-block">
           <div id="event-${id}-details">
             <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}">
-              <small><i class="bi-calendar"></i>&ensp;${weekday}, ${date}</small><br>
+              <small class="d-none d-md-block"><i class="bi-calendar"></i>&ensp;${weekday}, ${date}</small>
+              <small class="d-block d-md-none"><i class="bi-calendar"></i>&ensp;${weekdayShort}, ${dateShort}</small>
               <small><i class="bi-clock"></i>&ensp;${from} - ${to} Uhr</small><br>
-              <small><i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse</small><br class="d-none d-md-block">
+              <small><i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse</small>
+              <br class="d-none d-md-block">
               <small class="d-none d-md-block"><i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
             </p>
           </div>
