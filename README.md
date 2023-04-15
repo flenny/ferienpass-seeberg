@@ -16,8 +16,11 @@ The Ferienpass Seeberg is a popular program for children between the ages of 6 a
 The registration form is primarily designed to allow parents to book courses for their children. The website is built using HTML, CSS, and JavaScript and uses Google Apps Script as a backend for processing the course bookings. The registration form includes the following features:
 
 - Information about the program, including dates, activities, and prices
-- Detailed information about each course, including availability and age requirements
+- Detailed information about each course, including age requirements and real-time availability information
 - A registration form for parents to book courses for their children
+- Validates the chosen events whether they do not overlap in time
+- Validates the chosen events whether they match with the selected grade
+- If an event is fully booked, it's possible to join a waiting list
 - An administration interface (Google Spreadsheet) to manage the courses, registrations and volunteers
 
 ## Getting Started
