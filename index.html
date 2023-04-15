@@ -83,17 +83,21 @@
 
       // Load iframe if src was decrpyted previously and stored in localStorage
       if (localStorage.getItem("iframeSrc")) {
-        const result = JSON.parse(localStorage.getItem("iframeSrc"))
+        try {
+          const result = JSON.parse(localStorage.getItem("iframeSrc"))
 
-        if (result.expires > Date.now()) {
-          // Update expires date
-          result.expires = Date.now() + 1000 * 60 * 60 * 24 // 24 hours
-          localStorage.setItem("iframeSrc", JSON.stringify(result))
+          if (result.expires > Date.now()) {
+            // Update expires date
+            result.expires = Date.now() + 1000 * 60 * 60 * 24 // 24 hours
+            localStorage.setItem("iframeSrc", JSON.stringify(result))
 
-          // Show iframe
-          document.getElementById("iframe").src = getIframeSrc(result.src)
-          document.getElementById("iframe").style.display = "block"
-          return
+            // Show iframe
+            document.getElementById("iframe").src = getIframeSrc(result.src)
+            document.getElementById("iframe").style.display = "block"
+            return
+          }
+        } catch (e) {
+          console.error(e)
         }
       }
 
