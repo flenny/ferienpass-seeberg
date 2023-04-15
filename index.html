@@ -61,7 +61,7 @@
       </div>
       <div id="error" class="p-1 text-danger-emphasis bg-danger-subtle border border-danger-subtle rounded-3 mb-2"
         style="display: none;">
-        Leider nicht richtig 🤷🏼‍♂️
+        Leider knapp daneben 🙃
       </div>
       <button class="w-100 btn btn-lg btn-dark" type="submit"><i
           class="fa-solid fa-arrow-right-to-bracket"></i>&ensp;Anmelden</button>
@@ -72,66 +72,83 @@
     style="display:none; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
 
   <script>
-    // Get search params from URL
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    })
+    (async () => {
+      // Get search params from URL
+      const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+      })
 
-    // Get iframe src for given base URL
-    const getIframeSrc = baseUrl => `${baseUrl}?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
+      // Get iframe src for given base URL
+      const getIframeSrc = baseUrl => `${baseUrl}?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
 
-    // Load iframe if src was decrpyted previously and stored in localStorage
-    if (localStorage.getItem("iframeSrc")) {
-      document.getElementById("iframe").src = getIframeSrc(localStorage.getItem("iframeSrc"))
-      document.getElementById("iframe").style.display = "block"
-    }
-    else {
+      // Load iframe if src was decrpyted previously and stored in localStorage
+      if (localStorage.getItem("iframeSrc")) {
+        const result = JSON.parse(localStorage.getItem("iframeSrc"))
+
+        if (result.expires > Date.now()) {
+          // Update expires date
+          result.expires = Date.now() + 1000 * 60 * 60 * 24 // 24 hours
+          localStorage.setItem("iframeSrc", JSON.stringify(result))
+
+          // Show iframe
+          document.getElementById("iframe").src = getIframeSrc(result.src)
+          document.getElementById("iframe").style.display = "block"
+          return
+        }
+      }
+
       // Show the login form
       document.getElementById("form").style.display = "block"
-    }
 
-    form.onsubmit = async e => {
-      e.preventDefault();
+      form.onsubmit = async e => {
+        e.preventDefault();
 
-      const username = document.getElementById("username").value
-      const password = document.getElementById("password").value
+        const username = document.getElementById("username").value
+        const password = document.getElementById("password").value
 
-      // Hash username and password using SHA-256
-      const hashedUsername = sha256(username)
-      const hashedPassword = sha256(password)
+        // Hash username and password using SHA-256
+        const hashedUsername = sha256(username)
+        const hashedPassword = sha256(password)
 
-      // Check if username and hashed password matches the expected hashes
-      if (hashedUsername.localeCompare("2F149CB830D6DAF68B1BFF7B8F29B01B8CC85D1CB7C87FE06D51FE3CD6367ED7", undefined, { sensitivity: 'accent' }) === 0 &&
-        hashedPassword.localeCompare("1CB14D3982F507A7AF9F3337D4283F253F62B84EA65EFB2F32E913D07D80072C", undefined, { sensitivity: 'accent' }) === 0) {
+        // Check if username and hashed password matches the expected hashes
+        if (hashedUsername.localeCompare("2F149CB830D6DAF68B1BFF7B8F29B01B8CC85D1CB7C87FE06D51FE3CD6367ED7", undefined, { sensitivity: 'accent' }) === 0 &&
+          hashedPassword.localeCompare("1CB14D3982F507A7AF9F3337D4283F253F62B84EA65EFB2F32E913D07D80072C", undefined, { sensitivity: 'accent' }) === 0) {
 
-        /**
-          // Encrypt the iframe src using the password
-          // Uncomment the following lines to generate a new encrypted src
-          // and replace the encryptedSrc variable below with the output
-          console.log(
-          CryptoJS.AES.encrypt(
-            "https://www.example.com",
-            `${username}:${password}`).toString())
-        */
+          /**
+            // Encrypt the iframe src using the password
+            // Uncomment the following lines to generate a new encrypted src
+            // and replace the encryptedSrc variable below with the output
+            console.log(
+            CryptoJS.AES.encrypt(
+              "https://www.example.com",
+              `${username}:${password}`).toString())
+          */
 
-        const encryptedSrc = "U2FsdGVkX19iWxcFbeZ0E9GgZVoIWY4HroevSbOYcraghQzZIa3EMauMOgIKb5kruYs8gQIC3z194oyF65SaRWtG82hKpmuN4eJ0SCTyuDWK/WSZ4FAAKJuiY/QGQLhQ+hNmA2Nnic5oJDjLKoAK32rmW1i9YK74WihPFEkzoSpvfBFehAoLl4QrlJnQ93Yn"
-        const decryptedSrc = CryptoJS.AES.decrypt(encryptedSrc, `${username}:${password}`).toString(CryptoJS.enc.Utf8)
+          const encryptedSrc = "U2FsdGVkX19iWxcFbeZ0E9GgZVoIWY4HroevSbOYcraghQzZIa3EMauMOgIKb5kruYs8gQIC3z194oyF65SaRWtG82hKpmuN4eJ0SCTyuDWK/WSZ4FAAKJuiY/QGQLhQ+hNmA2Nnic5oJDjLKoAK32rmW1i9YK74WihPFEkzoSpvfBFehAoLl4QrlJnQ93Yn"
+          const decryptedSrc = CryptoJS.AES.decrypt(encryptedSrc, `${username}:${password}`).toString(CryptoJS.enc.Utf8)
 
-        // Save decrypted src to local storage
-        localStorage.setItem("iframeSrc", decryptedSrc)
+          // Create a new json object containing the decrypted src and a expiration date
+          const iframeSrc = {
+            src: decryptedSrc,
+            expires: new Date().getTime() + 1000 * 60 * 60 * 24 // 24 hours
+          }
 
-        // Set the decrypted src as the iframe source
-        // Append the original query string to the decrypted src
-        document.getElementById("iframe").src = getIframeSrc(decryptedSrc)
+          // Store iframe src in localStorage
+          localStorage.setItem("iframeSrc", JSON.stringify(iframeSrc))
 
-        // Show the iframe
-        document.getElementById("iframe").style.display = "block"
+          // Set the decrypted src as the iframe source
+          // Append the original query string to the decrypted src
+          document.getElementById("iframe").src = getIframeSrc(decryptedSrc)
+
+          // Show the iframe
+          document.getElementById("iframe").style.display = "block"
+        }
+        else {
+          // Show error message
+          document.getElementById("error").style.display = "block"
+        }
       }
-      else {
-        // Show error message
-        document.getElementById("error").style.display = "block"
-      }
-    }
+    })()
   </script>
 </body>
 
