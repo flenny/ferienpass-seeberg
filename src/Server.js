@@ -145,12 +145,11 @@ function processForm(formObject) {
     <html>
       <body style="font-size: 16px;">
         <img src="https://booking.ferienpass-seeberg.ch/ferienpass.webp" alt="Logo Ferienpass Seeberg" style="max-width: 12em;">
-        <p style="font-size: 20px;">Hallo ${firstName} 👋🏻<p>
-        <p>Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Wir freuen uns sehr, dass du
-        dabei bist 🥳.</p>
-        <p>Du kannst <a href="${getStatusUrl(origin, reference)}">hier</a> jederzeit
-        den Status deiner gebuchten Kurse überprüfen. Die Rechnung, unter Berücksichtigung
-        der im Programmheft beschriebenen Familienpauschale, erhältst du nach Anmeldeschluss.</p>
+        <p style="font-size: 20px;">Hallo ${firstName} 👋🏻</p>
+        <p>Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Wir freuen uns sehr, dass du dabei bist 🥳.</p>
+        <p>Du kannst <a href="${getStatusUrl(origin, reference)}">hier</a> jederzeit den Status deiner gebuchten Kurse überprüfen.
+        Die Rechnung, unter Berücksichtigung der im Programmheft beschriebenen Familienpauschale, wie auch die definitive Kurseinteilung
+        erhältst du nach Anmeldeschluss im Juni.</p>
         <p><a href="${getPreFilledFormUrl(origin, bookingId)}" target="_top">Hier</a> kannst du weitere Kurse buchen.</p>
         <p>Tschüss und bis bald</p>
         <p>Dein Ferienpass Seeberg Team</p>
@@ -167,8 +166,8 @@ function processForm(formObject) {
 
       ${getStatusUrl(origin, reference)}
 
-      Die Rechnung, unter Beruecksichtigung der im Programmheft beschriebenen Familienpauschale,
-      erhaeltst du nach Anmeldeschluss.
+      Die Rechnung, unter Beruecksichtigung der im Programmheft beschriebenen Familienpauschale, wie auch die definitive Kurseinteilung
+      erhaeltst du nach Anmeldeschluss im Juni.
 
       Hier kannst du weitere Kurse buchen.
 

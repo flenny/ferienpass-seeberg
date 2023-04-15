@@ -1,122 +1,124 @@
 <script>
-  const POLL_INTERVAL = 10000
-  const LOCALES_INDENTIFIER = 'de-CH'
-  const EVENTS_TABLE_ID = 'events'
 
-  // raw event data
-  let eventData
+  (async () => {
+    const POLL_INTERVAL = 10000
+    const LOCALES_INDENTIFIER = 'de-CH'
+    const EVENTS_TABLE_ID = 'events'
 
-  const setupDataTable = () => new DataTable(`#${EVENTS_TABLE_ID}`, {
-    lengthChange: false,
-    pageLength: 6,
-    order: [[1, 'asc']],
-    language: {
-      "paginate": {
-        "next": "<i class=\"fa-solid fa-angles-right\"></i>",
-        "previous": "<i class=\"fa-solid fa-angles-left\"></i>"
-      },
-      "infoFiltered": "",
-      "infoEmpty": "",
-      "search": "",
-      "searchPlaceholder": "Suchen...",
-      "zeroRecords": "Es wurden leider keine Kurse gefunden.",
-      "info": "_START_ bis _END_ von _TOTAL_ Kursen",
-    }
-  })
+    // raw event data
+    let eventData
 
-  const refreshEvents = () => {
-    google.script.run.withSuccessHandler(events => {
-      eventData = Object.values(events)
-      updateEvents(eventData)
-      setTimeout(refreshEvents, POLL_INTERVAL)
-    }).getEvents()
-  }
-
-  const populateData = () => {
-    google.script.run.withSuccessHandler(events => {
-      const tbody = document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
-      while (tbody.hasChildNodes()) tbody.removeChild(tbody.lastChild)
-      eventData = Object.values(events)
-      eventData.forEach(event => addEventToForm(event))
-      setupDataTable()
-    }).getEvents()
-  }
-
-  const updateEvents = events => {
-    events.forEach(event => {
-      const [id] = event
-      const container = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-status`)
-      if (container) container.innerHTML = getEventStatus(event)
-      else addEventToForm(event)
+    const setupDataTable = () => new DataTable(`#${EVENTS_TABLE_ID}`, {
+      lengthChange: false,
+      pageLength: 6,
+      order: [[1, 'asc']],
+      language: {
+        "paginate": {
+          "next": "<i class=\"fa-solid fa-angles-right\"></i>",
+          "previous": "<i class=\"fa-solid fa-angles-left\"></i>"
+        },
+        "infoFiltered": "",
+        "infoEmpty": "",
+        "search": "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+        "searchPlaceholder": "Suchen...",
+        "zeroRecords": "Es wurden leider keine Kurse gefunden.",
+        "info": "_START_ bis _END_ von _TOTAL_ Kursen",
+      }
     })
-  }
 
-  const getEventStatus = event => {
-    const [id, , , , , , , , , , participantLimit, bookings, availableSeats] = event
-    let [badgeState, badgeText] = ['success', 'freie Plätze']
-    if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
-    else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
-    return `
-    <br class="d-none d-md-block">
-    <p>
-      <small class="d-none d-lg-block">
-        <i class="bi-people-fill"></i>&ensp;Anzahl Plätze: ${participantLimit}<br>
-        <i class="bi-pencil-square"></i>&ensp;Anmeldungen: ${bookings}<br>
-        <i class="bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
-      </small>
-      <span class="badge text-bg-${badgeState} bg-${badgeState}">${badgeText}</span>
-    </p>
-  `
-  }
+    const refreshEvents = () => {
+      google.script.run.withSuccessHandler(events => {
+        eventData = Object.values(events)
+        updateEvents(eventData)
+        setTimeout(refreshEvents, POLL_INTERVAL)
+      }).getEvents()
+    }
 
-  const addEventToForm = event => {
-    const [id, name, description, , costs, additionalCosts, start, end, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
+    const populateData = async () => {
+      await google.script.run.withSuccessHandler(events => {
+        const tbody = document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
+        while (tbody.hasChildNodes()) tbody.removeChild(tbody.lastChild)
+        eventData = Object.values(events)
+        eventData.forEach(event => addEventToForm(event))
+        setupDataTable()
+      }).getEvents()
+    }
 
-    // Distinguish between the table body and the DataTable object
-    const events = DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ?
-      $(`#${EVENTS_TABLE_ID}`).DataTable() :
-      document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
+    const updateEvents = events => {
+      events.forEach(event => {
+        const [id] = event
+        const container = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-status`)
+        if (container) container.innerHTML = getEventStatus(event)
+        else addEventToForm(event)
+      })
+    }
 
-    // Create a string to display the costs of the event
-    let costsDisplaySring = ''
-    if (costs + additionalCosts <= 0) costsDisplaySring = 'gratis'
-    else if (additionalCosts === 0) costsDisplaySring = `${costs} CHF`
-    else costsDisplaySring = `${costs} CHF (+ ${additionalCosts} CHF)`
+    const getEventStatus = event => {
+      const [id, , , , , , , , , , participantLimit, bookings, availableSeats] = event
+      let [badgeState, badgeText] = ['success', 'freie Plätze']
+      if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
+      else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
+      return `
+      <br class="d-none d-md-block">
+      <p>
+        <small class="d-none d-lg-block" style="white-space:nowrap;">
+          <i class="bi-people-fill"></i>&ensp;Anzahl Plätze: ${participantLimit}<br>
+          <i class="bi-pencil-square"></i>&ensp;Anmeldungen: ${bookings}<br>
+          <i class="bi-check2-square"></i>&ensp;Freie Plätze: ${availableSeats}
+        </small>
+        <span class="badge text-bg-${badgeState} bg-${badgeState}">${badgeText}</span>
+      </p>
+    `
+    }
 
-    // Format the date and time
-    const weekday = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { weekday: 'long' })
-    const date = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { day: 'numeric', month: 'long' })
-    const from = new Date(start).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
-    const to = new Date(end).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
+    const addEventToForm = event => {
+      const [id, name, description, , costs, additionalCosts, start, end, gradeFrom, gradeTo, participantLimit, , availableSeats] = event
 
-    // Create meta data which is used to filter the events by grade
-    const gradeMetaData = []
-    for (let i = gradeFrom; i <= gradeTo; i++) gradeMetaData.push(`grade-${i}`)
+      // Distinguish between the table body and the DataTable object
+      const events = DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ?
+        $(`#${EVENTS_TABLE_ID}`).DataTable() :
+        document.getElementById(EVENTS_TABLE_ID).getElementsByTagName('tbody')[0]
 
-    // Replace letters in the event id with numbers to make it sortable
-    const orderableEventId = id.toString().replace(/[a-z]/g, c => `.${c.charCodeAt(0) - 87}`)
+      // Create a string to display the costs of the event
+      let costsDisplaySring = ''
+      if (costs + additionalCosts <= 0) costsDisplaySring = 'gratis'
+      else if (additionalCosts === 0) costsDisplaySring = `${costs} CHF`
+      else costsDisplaySring = `${costs} CHF (+ ${additionalCosts} CHF)`
 
-    // Replace the weekday with a number to make it sortable
-    const orderableWeekday = new Date(start).getDay()
+      // Format the date and time
+      const weekday = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { weekday: 'long' })
+      const date = new Date(start).toLocaleDateString(LOCALES_INDENTIFIER, { day: 'numeric', month: 'long' })
+      const from = new Date(start).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
+      const to = new Date(end).toLocaleTimeString(LOCALES_INDENTIFIER, { hour: '2-digit', minute: '2-digit' })
 
-    const result = `
+      // Create meta data which is used to filter the events by grade
+      const gradeMetaData = []
+      for (let i = gradeFrom; i <= gradeTo; i++) gradeMetaData.push(`grade-${i}`)
+
+      // Replace letters in the event id with numbers to make it sortable
+      const orderableEventId = id.toString().replace(/[a-z]/g, c => `.${c.charCodeAt(0) - 87}`)
+
+      // Replace the weekday with a number to make it sortable
+      const orderableWeekday = new Date(start).getDay()
+
+      const result = `
       <tr>
         <td>
           <input id="event-${id}-input" class="fa-checkbox-square" type="checkbox" name="eventId" value="${id}">
         </td>
-        <td class="d-none d-sm-table-cell" data-order="${orderableEventId}">${id}</td>
+        <td data-order="${orderableEventId}" class="d-none d-sm-table-cell">${id}</td>
         <td>
-          <label class="form-label" for="event-${id}-input">${name}</label>
-          <p class="d-none d-md-block"><small>${description}</small></p>
+          <label class="form-label line-clamp-2" for="event-${id}-input">${name}</label>
+          <p class="d-none d-md-block" title="${description}"><small class="line-clamp-4">${description}</small></p>
         </td>
         <td data-order="${orderableWeekday}">
           <br class="d-none d-md-block">
           <div id="event-${id}-details">
-            <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}"><small>
-              <i class="bi-calendar"></i>&ensp;${weekday}, ${date}<br>
-              <i class="bi-clock"></i>&ensp;${from} - ${to} Uhr<br>
-              <i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse<br>
-              <i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
+            <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}">
+              <small><i class="bi-calendar"></i>&ensp;${weekday}, ${date}</small><br>
+              <small><i class="bi-clock"></i>&ensp;${from} - ${to} Uhr</small><br>
+              <small><i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse</small><br class="d-none d-md-block">
+              <small class="d-none d-md-block"><i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
             </p>
           </div>
         </td>
@@ -127,157 +129,158 @@
         </td>
       </tr>
     `
-    // If the DataTable object exists, add the event to the table, otherwise append it to the table body
-    DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ? events.row.add($(result)) : events.insertAdjacentHTML('beforeend', result)
-  }
+      // If the DataTable object exists, add the event to the table, otherwise append it to the table body
+      DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ? events.row.add($(result)) : events.insertAdjacentHTML('beforeend', result)
+    }
 
-  const alertArea = document.getElementById('alertArea')
-  const clearAlert = id => document.getElementById(`alert-${id}`)?.remove()
-  const clearAllAlerts = () => alertArea.innerHTML = ''
-  const alert = async (type, head, body) => {
-    const id = Date.now()
-    const wrapper = document.createElement('div')
-    wrapper.id = `alert-${id}`
-    wrapper.innerHTML = `
+    const alertArea = document.getElementById('alertArea')
+    const clearAlert = id => document.getElementById(`alert-${id}`)?.remove()
+    const clearAllAlerts = () => alertArea.innerHTML = ''
+    const alert = async (type, head, body) => {
+      const id = Date.now()
+      const wrapper = document.createElement('div')
+      wrapper.id = `alert-${id}`
+      wrapper.innerHTML = `
       <div class="alert alert-${type} alert-dismissible fade show">
         <h4 class="alert-heading">${head}</h4>
         <p>${body}</p>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
     `
-    alertArea.append(wrapper)
+      alertArea.append(wrapper)
 
-    // Wait 20 seconds before clearing the alert
-    await new Promise(r => setTimeout(r, 20000));
-    clearAlert(id)
-  }
-
-  form.onsubmit = async e => {
-    e.preventDefault()
-    e.stopPropagation()
-    clearAllAlerts()
-
-    // Get selected events from events datatable
-    const selectedEvents = []
-    $(`#${EVENTS_TABLE_ID}`).DataTable()
-      .$('input[name="eventId"]:checked').each(function () {
-        selectedEvents.push($(this).val());
-      })
-
-    // Check for at least one event
-    if (selectedEvents.length === 0) {
-      alert(
-        'warning',
-        'Unvollständige Anmeldung',
-        'Bitte wähle mindestens einen (1) Kurs aus. Es sollte für jeden und jede etwas spannendes dabei sein.')
-      return
+      // Wait 20 seconds before clearing the alert
+      await new Promise(r => setTimeout(r, 20000));
+      clearAlert(id)
     }
 
-    // Validate if selected events match the selected grade
-    const selectedGrade = document.getElementById('grade').value
-    let nonMatchingEvents = []
-    selectedEvents.forEach(id => {
-      const eventMetaData = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-details`)[0].outerHTML
-      !eventMetaData.includes(`grade-${selectedGrade}`) && nonMatchingEvents.push(id)
-    })
+    form.onsubmit = async e => {
+      e.preventDefault()
+      e.stopPropagation()
+      clearAllAlerts()
 
-    // Remove duplicates and sort alphanumeric keys
-    nonMatchingEvents = nonMatchingEvents
-      .filter((v, i, a) => a.indexOf(v) === i)
-      .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
+      // Get selected events from events datatable
+      const selectedEvents = []
+      $(`#${EVENTS_TABLE_ID}`).DataTable()
+        .$('input[name="eventId"]:checked').each(function () {
+          selectedEvents.push($(this).val());
+        })
 
-    // Show alert if there are events that do not match the selected grade
-    if (nonMatchingEvents.length > 0) {
-      alert(
-        'warning',
-        'Ungültige Kurse',
-        `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt,
+      // Check for at least one event
+      if (selectedEvents.length === 0) {
+        alert(
+          'warning',
+          'Unvollständige Anmeldung',
+          'Bitte wähle mindestens einen (1) Kurs aus. Es sollte für jeden und jede etwas spannendes dabei sein.')
+        return
+      }
+
+      // Validate if selected events match the selected grade
+      const selectedGrade = document.getElementById('grade').value
+      let nonMatchingEvents = []
+      selectedEvents.forEach(id => {
+        const eventMetaData = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-details`)[0].outerHTML
+        !eventMetaData.includes(`grade-${selectedGrade}`) && nonMatchingEvents.push(id)
+      })
+
+      // Remove duplicates and sort alphanumeric keys
+      nonMatchingEvents = nonMatchingEvents
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
+
+      // Show alert if there are events that do not match the selected grade
+      if (nonMatchingEvents.length > 0) {
+        alert(
+          'warning',
+          'Ungültige Kurse',
+          `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt,
         die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
-      return
-    }
+        return
+      }
 
-    // Validate if selected events do not overlap in time
-    let overlappingEvents = []
-    selectedEvents.forEach(eventId1 => {
-      const [, , , , , , start, end] = eventData.find(e => e[0] == eventId1)
-      const event1Start = new Date(start)
-      const event1End = new Date(end)
-      selectedEvents.forEach(eventId2 => {
-        if (eventId1 === eventId2) return
-        const [, , , , , , start, end] = eventData.find(e => e[0] == eventId2)
-        const event2Start = new Date(start)
-        const event2End = new Date(end)
-        if (event1Start < event2End && event1End > event2Start) overlappingEvents.push(eventId1)
+      // Validate if selected events do not overlap in time
+      let overlappingEvents = []
+      selectedEvents.forEach(eventId1 => {
+        const [, , , , , , start, end] = eventData.find(e => e[0] == eventId1)
+        const event1Start = new Date(start)
+        const event1End = new Date(end)
+        selectedEvents.forEach(eventId2 => {
+          if (eventId1 === eventId2) return
+          const [, , , , , , start, end] = eventData.find(e => e[0] == eventId2)
+          const event2Start = new Date(start)
+          const event2End = new Date(end)
+          if (event1Start < event2End && event1End > event2Start) overlappingEvents.push(eventId1)
+        })
       })
-    })
 
-    // Remove duplicates and sort alphanumeric keys
-    overlappingEvents = overlappingEvents
-      .filter((v, i, a) => a.indexOf(v) === i)
-      .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
+      // Remove duplicates and sort alphanumeric keys
+      overlappingEvents = overlappingEvents
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .sort((a, b) => a.toString().localeCompare(b.toString(), 'de', { numeric: true }))
 
-    // Show alert if there are overlapping events
-    if (overlappingEvents.length > 0) {
-      alert(
-        'warning',
-        'Überlappende Kurse',
-        `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt,
+      // Show alert if there are overlapping events
+      if (overlappingEvents.length > 0) {
+        alert(
+          'warning',
+          'Überlappende Kurse',
+          `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt,
         die zeitgleich stattfinden: ${overlappingEvents.join(', ')}`)
-      return
-    }
+        return
+      }
 
-    const modalDialogSend = new bootstrap.Modal('#modal-send')
-    const modalDialogSuccess = new bootstrap.Modal('#modal-success')
+      const modalDialogSend = new bootstrap.Modal('#modal-send')
+      const modalDialogSuccess = new bootstrap.Modal('#modal-success')
 
-    if (form.checkValidity()) {
-      const formData = new FormData(form)
-      formData.delete('eventId')
-      selectedEvents.forEach(id => formData.append('eventId', id))
+      if (form.checkValidity()) {
+        const formData = new FormData(form)
+        formData.delete('eventId')
+        selectedEvents.forEach(id => formData.append('eventId', id))
 
-      modalDialogSend.show()
-      google.script.run
-        .withFailureHandler(error => {
-          modalDialogSend.hide()
-          alert('danger', 'Oh nein! Ein Fehler 🙈', 'Beim Speichern deiner Daten ist leider ein Fehler aufgetreten. Versuche es bitte nochmals und melde dich bei mir (E-Mail ist unten verlinkt), falls es weiterhin nicht funktioniert.')
-          console.log(error)
-        })
-        .withSuccessHandler(async redirectUrl => {
-          try {
-            window.top.location.href = redirectUrl;
-          }
-          catch (error) { console.log(error) }
-          finally {
-            await new Promise(r => setTimeout(r, 1000));
-            document.getElementById('btn-success-redirect').href = redirectUrl
+        modalDialogSend.show()
+        google.script.run
+          .withFailureHandler(error => {
             modalDialogSend.hide()
-            modalDialogSuccess.show()
-          }
+            alert('danger', 'Oh nein! Ein Fehler 🙈', 'Beim Speichern deiner Daten ist leider ein Fehler aufgetreten. Versuche es bitte nochmals und melde dich bei mir (E-Mail ist unten verlinkt), falls es weiterhin nicht funktioniert.')
+            console.log(error)
+          })
+          .withSuccessHandler(async redirectUrl => {
+            try {
+              window.top.location.href = redirectUrl;
+            }
+            catch (error) { console.log(error) }
+            finally {
+              await new Promise(r => setTimeout(r, 1000));
+              document.getElementById('btn-success-redirect').href = redirectUrl
+              modalDialogSend.hide()
+              modalDialogSuccess.show()
+            }
+          })
+          .processForm([...formData.entries()])
+      }
+      else {
+        alert('warning', 'Fehlende Angaben in der Anmeldung', 'Es fehlen noch Angaben in der Anmeldung. Bitte überprüfe deine Angaben und versuche es erneut.')
+        form.classList.add('was-validated')
+      }
+    }
+
+    await populateData()
+    setTimeout(refreshEvents, POLL_INTERVAL);
+
+    const bookingId = document.getElementById('bookingId').value
+    if (bookingId) {
+      google.script.run
+        .withSuccessHandler(bookings => {
+          if (bookings.length === 0) return
+          const booking = Object.values(bookings).pop()
+          const [, , email, , , phone, address, zip, city] = booking
+          document.getElementById('email').value = email
+          document.getElementById('phone').value = phone
+          document.getElementById('address').value = address
+          document.getElementById('zip').value = zip
+          document.getElementById('city').value = city
         })
-        .processForm([...formData.entries()])
+        .getBookings(bookingId)
     }
-    else {
-      alert('warning', 'Fehlende Angaben in der Anmeldung', 'Es fehlen noch Angaben in der Anmeldung. Bitte überprüfe deine Angaben und versuche es erneut.')
-      form.classList.add('was-validated')
-    }
-  }
-
-  populateData()
-  setTimeout(refreshEvents, POLL_INTERVAL);
-
-  const bookingId = document.getElementById('bookingId').value
-  if (bookingId) {
-    google.script.run
-      .withSuccessHandler(bookings => {
-        if (bookings.length === 0) return
-        const booking = Object.values(bookings).pop()
-        const [, , email, , , phone, address, zip, city] = booking
-        document.getElementById('email').value = email
-        document.getElementById('phone').value = phone
-        document.getElementById('address').value = address
-        document.getElementById('zip').value = zip
-        document.getElementById('city').value = city
-      })
-      .getBookings(bookingId)
-  }
+  })()
 
 </script>
