@@ -46,10 +46,11 @@
     }
 
     const updateEvents = events => {
+      const dataTable = $(`#${EVENTS_TABLE_ID}`).DataTable()
       events.forEach(event => {
         const [id] = event
-        const container = $(`#${EVENTS_TABLE_ID}`).DataTable().$(`#event-${id}-status`)
-        if (container) container.innerHTML = getEventStatus(event)
+        const statusCell = dataTable.cell(`#event-${id}-status`)
+        if (statusCell) statusCell.data(getEventStatus(event))
         else addEventToForm(event)
       })
     }
@@ -112,7 +113,7 @@
         <td data-order="${orderableEventId}" class="d-none d-sm-table-cell">${id}</td>
         <td>
           <label class="form-label line-clamp-2" for="event-${id}-input">${name}</label>
-          <p class="d-none d-md-block" title="${description}"><small class="line-clamp-4">${description}</small></p>
+          <p class="d-none d-md-block no-margin" title="${description}"><small class="line-clamp-4">${description}</small></p>
         </td>
         <td data-order="${orderableWeekday}">
           <br class="d-none d-md-block">
@@ -128,10 +129,8 @@
             </p>
           </div>
         </td>
-        <td>
-          <div id="event-${id}-status">
-            ${getEventStatus(event)}
-          </div>
+        <td id="event-${id}-status">
+          ${getEventStatus(event)}
         </td>
       </tr>
     `
