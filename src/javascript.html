@@ -2,6 +2,7 @@
 
   (async () => {
     const POLL_INTERVAL = 20000
+    const ALERT_TIMEOUT = 20000
     const LOCALES_INDENTIFIER = 'de-CH'
     const EVENTS_TABLE_ID = 'events'
 
@@ -119,7 +120,8 @@
             <p style="white-space: nowrap;" data-search-meta="${gradeMetaData.join(' ')}">
               <small class="d-none d-md-block"><i class="bi-calendar"></i>&ensp;${weekday}, ${date}</small>
               <small class="d-block d-md-none"><i class="bi-calendar"></i>&ensp;${weekdayShort}, ${dateShort}</small>
-              <small><i class="bi-clock"></i>&ensp;${from} - ${to} Uhr</small><br>
+              <small class="d-none d-md-block"><i class="bi-clock"></i>&ensp;${from} - ${to} Uhr</small>
+              <small class="d-block d-md-none"><i class="bi-clock"></i>&ensp;${from}-${to}</small>
               <small><i class="bi-tencent-qq"></i>&ensp;${gradeFrom}.-${gradeTo}. Klasse</small>
               <br class="d-none d-md-block">
               <small class="d-none d-md-block"><i class="bi-piggy-bank"></i>&ensp;${costsDisplaySring}</small>
@@ -153,8 +155,8 @@
     `
       alertArea.append(wrapper)
 
-      // Wait 20 seconds before clearing the alert
-      await new Promise(r => setTimeout(r, 20000));
+      // Wait x seconds before clearing the alert
+      await new Promise(r => setTimeout(r, ALERT_TIMEOUT));
       clearAlert(id)
     }
 
@@ -194,11 +196,12 @@
 
       // Show alert if there are events that do not match the selected grade
       if (nonMatchingEvents.length > 0) {
+        nonMatchingEvents = nonMatchingEvents.map(id => `${eventData.find(e => e[0] == id)[1]} (${id})`)
         alert(
           'warning',
           'Ungültige Kurse',
           `Bitte wähle nur Kurse aus, die für die ${selectedGrade}. Klasse bestimmt sind. Du hast folgende Kurse ausgewählt,
-        die nicht für die ${selectedGrade}. Klasse sind: ${nonMatchingEvents.join(', ')}`)
+        die nicht für die ${selectedGrade}. Klasse sind: <b>${nonMatchingEvents.join(', ')}<b>`)
         return
       }
 
@@ -224,11 +227,12 @@
 
       // Show alert if there are overlapping events
       if (overlappingEvents.length > 0) {
+        overlappingEvents = overlappingEvents.map(id => `${eventData.find(e => e[0] == id)[1]} (${id})`)
         alert(
           'warning',
           'Überlappende Kurse',
           `Bitte wähle nur Kurse aus, die nicht zeitgleich stattfinden. Du hast folgende Kurse ausgewählt,
-        die zeitgleich stattfinden: ${overlappingEvents.join(', ')}`)
+        die zeitgleich stattfinden: <b>${overlappingEvents.join(', ')}<b>`)
         return
       }
 

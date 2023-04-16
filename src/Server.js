@@ -109,7 +109,7 @@ function processForm(formObject) {
         else if (header === 'allowParticipantList') return formObject.find(entry => entry[0] === 'allowParticipantList')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'allowPhotos') return formObject.find(entry => entry[0] === 'allowPhotos')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'reference') return reference
-        else if (header === 'url') return getStatusUrl(origin, reference)
+        else if (header === 'url') return getStatusUrl(origin, reference, bookingId)
         else return formObject.find(entry => entry[0] === header)?.[1]
       }))
     })
@@ -147,7 +147,7 @@ function processForm(formObject) {
         <img src="https://booking.ferienpass-seeberg.ch/ferienpass.webp" alt="Logo Ferienpass Seeberg" style="max-width: 12em;">
         <p style="font-size: 20px;">Hallo ${firstName} 👋🏻</p>
         <p>Vielen herzlichen Dank für deine Anmeldung beim Ferienpass Seeberg. Wir freuen uns sehr, dass du dabei bist 🥳.</p>
-        <p>Du kannst <a href="${getStatusUrl(origin, reference)}">hier</a> jederzeit den Status deiner gebuchten Kurse überprüfen.
+        <p>Du kannst <a href="${getStatusUrl(origin, reference, bookingId)}">hier</a> jederzeit den Status deiner gebuchten Kurse überprüfen.
         Die Rechnung, unter Berücksichtigung der im Programmheft beschriebenen Familienpauschale, wie auch die definitive Kurseinteilung
         erhältst du nach Anmeldeschluss im Juni.</p>
         <p><a href="${getPreFilledFormUrl(origin, bookingId)}" target="_top">Hier</a> kannst du weitere Kurse buchen.</p>
@@ -164,7 +164,7 @@ function processForm(formObject) {
 
       Unter dem nachfolgenden Link kannst du jederzeit den Status deiner gebuchten Kurse ueberpruefen.
 
-      ${getStatusUrl(origin, reference)}
+      ${getStatusUrl(origin, reference, bookingId)}
 
       Die Rechnung, unter Beruecksichtigung der im Programmheft beschriebenen Familienpauschale, wie auch die definitive Kurseinteilung
       erhaeltst du nach Anmeldeschluss im Juni.
@@ -243,7 +243,7 @@ const updateCache = (identifier, sheetName) => {
 }
 
 // Get the status url
-const getStatusUrl = (baseUrl, reference) => `${baseUrl}?action=status&reference=${reference}`
+const getStatusUrl = (baseUrl, reference, bookingId) => `${baseUrl}?action=status&reference=${reference}&bookingId=${bookingId}`
 
 // Get the pre-filled form url
 const getPreFilledFormUrl = (baseUrl, bookingId) => `${baseUrl}?bookingId=${bookingId}`
