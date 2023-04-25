@@ -109,7 +109,7 @@ function processForm(formObject) {
         else if (header === 'allowParticipantList') return formObject.find(entry => entry[0] === 'allowParticipantList')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'allowPhotos') return formObject.find(entry => entry[0] === 'allowPhotos')?.[1] ? 'Ja' : 'Nein'
         else if (header === 'reference') return reference
-        else if (header === 'url') return getStatusUrl(origin, reference, bookingId)
+        else if (header === 'url') return getStatusUrl(origin, reference)
         else return formObject.find(entry => entry[0] === header)?.[1]
       }))
     })
@@ -242,8 +242,12 @@ const updateCache = (identifier, sheetName) => {
   return result
 }
 
-// Get the status url
-const getStatusUrl = (baseUrl, reference, bookingId) => `${baseUrl}?action=status&reference=${reference}&bookingId=${bookingId}`
+// Get the status url with optional bookingId
+const getStatusUrl = (baseUrl, reference, bookingId) => {
+  let result = `${baseUrl}?action=status&reference=${reference}`
+  if (bookingId) result += `&bookingId=${bookingId}`
+  return result
+}
 
 // Get the pre-filled form url
 const getPreFilledFormUrl = (baseUrl, bookingId) => `${baseUrl}?bookingId=${bookingId}`
