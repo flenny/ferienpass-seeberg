@@ -61,7 +61,7 @@ We welcome contributions to the ferienpass-seeberg repository! If you find a bug
 
 ## License
 
-The ferienpass-seeberg repository is released under the MIT License. See the LICENSE file for details.
+The ferienpass-seeberg repository is released under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
 
