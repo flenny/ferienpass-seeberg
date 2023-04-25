@@ -27,12 +27,18 @@
       }
     })
 
+    // Refresh the events every 20 seconds, retry if the request fails
     const refreshEvents = () => {
-      google.script.run.withSuccessHandler(events => {
-        eventData = Object.values(events)
-        updateEvents(eventData)
-        setTimeout(refreshEvents, POLL_INTERVAL)
-      }).getEvents()
+      google.script.run
+        .withFailureHandler(error => {
+          console.error(error)
+          setTimeout(refreshEvents, POLL_INTERVAL)
+        })
+        .withSuccessHandler(events => {
+          eventData = Object.values(events)
+          updateEvents(eventData)
+          setTimeout(refreshEvents, POLL_INTERVAL)
+        }).getEvents()
     }
 
     const populateData = async () => {
