@@ -87,7 +87,7 @@ function processForm(formObject) {
       PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'))
 
     const origin = formObject.find(entry => entry[0] === 'origin')?.[1]
-    const phone = `'${formObject.find(entry => entry[0] === 'phone')?.[1]}`.trim()
+    const phone = `'${formObject.find(entry => entry[0] === 'phone')?.[1].trim().replace(/\s+/g, '')}`
     let bookings = []
 
     // create a full record for every booked event
