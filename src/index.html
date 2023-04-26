@@ -40,6 +40,13 @@
             <small class="text-body-secondary">in der Woche vom 7. - 11. August 2023</small>
           </h2>
 
+          <p class="lead d-inline d-sm-none">
+            <span class="small"><b>Legende Verfügbarkeit:</b></span><br>
+            <span class="badge bg-success text-bg-success">freie Plätze</span>
+            <span class="badge bg-warning text-bg-warning">wenige Plätze</span>
+            <span class="badge bg-danger text-bg-danger">Warteliste</span>
+          </p>
+
           <div class="table-responsive">
             <table id="events" class="table table-hover">
               <thead>
@@ -48,7 +55,7 @@
                   <th class="d-none d-sm-table-cell">Nr.</th>
                   <th class="w-50" scope="col">Beschreibung</th>
                   <th scope="col">Details</th>
-                  <th scope="col" data-orderable="false">Status</th>
+                  <th scope="col" data-orderable="false"><span class="d-none d-sm-table-cell">Status</span></th>
                 </tr>
               </thead>
               <tbody>
