@@ -78,9 +78,6 @@
         get: (searchParams, prop) => searchParams.get(prop),
       })
 
-      // Get iframe src for given base URL
-      const getIframeSrc = baseUrl => `${baseUrl}?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
-
       // Load iframe if src was decrpyted previously and stored in localStorage
       if (localStorage.getItem("iframeSrc")) {
         try {
@@ -92,7 +89,8 @@
             localStorage.setItem("iframeSrc", JSON.stringify(result))
 
             // Show iframe
-            document.getElementById("iframe").src = getIframeSrc(result.src)
+            document.getElementById("iframe").src =
+              `${result.src}?action=${params.action ?? 'index'}&reference=${params.reference}&bookingId=${params.bookingId}&origin=${window.location.origin}`
             document.getElementById("iframe").style.display = "block"
             return
           }
@@ -140,12 +138,8 @@
           // Store iframe src in localStorage
           localStorage.setItem("iframeSrc", JSON.stringify(iframeSrc))
 
-          // Set the decrypted src as the iframe source
-          // Append the original query string to the decrypted src
-          document.getElementById("iframe").src = getIframeSrc(decryptedSrc)
-
-          // Show the iframe
-          document.getElementById("iframe").style.display = "block"
+          // Reload page
+          window.location.reload()
         }
         else {
           // Show error message
