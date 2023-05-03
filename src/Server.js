@@ -226,20 +226,23 @@ const createSignature = (value, key, length) => {
 }
 
 const updateCache = (identifier, sheetName) => {
-  let result
+  const label = `updateCache-${identifier}`
+  console.time(label)
   const lock = LockService.getScriptLock()
   const hasLock = lock.tryLock(SCRIPT_LOCK_TIMEOUT)
   if (!hasLock) { throw new Error('Could not obtain lock after 40 seconds.') }
   try {
     const spreadsheet = SpreadsheetApp.openById(
       PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'))
-    const data = getDataFromSheet(spreadsheet, sheetName)
-    CacheService.getScriptCache().put(identifier, data, CACHE_EXPIRATION_TIMEOUT)
-    result = data
+    const result = getDataFromSheet(spreadsheet, sheetName)
+    CacheService.getScriptCache().put(identifier, result, CACHE_EXPIRATION_TIMEOUT)
+    return result
   }
   catch (error) { throw error }
-  finally { lock.releaseLock() }
-  return result
+  finally {
+    lock.releaseLock()
+    console.timeEnd(label)
+  }
 }
 
 // Get the status url with optional bookingId
