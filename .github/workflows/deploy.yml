@@ -18,7 +18,8 @@ jobs:
     - name: Patch and copy artifacts
       run: |
         mkdir _site
-        cp index.html ferienpass.webp ferienpass-transparent.webp ./_site/
+        cp ferienpass.webp ferienpass-transparent.webp ./_site/
+        GOOGLE_APP_SCRIPS_ID=${{ secrets.GOOGLE_APP_SCRIPS_ID }} envsubst < index.html > ./_site/index.html
 
     - name: Upload artifacts
       uses: actions/upload-pages-artifact@v1
