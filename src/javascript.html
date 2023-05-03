@@ -281,7 +281,7 @@
     setTimeout(refreshEvents, POLL_INTERVAL);
 
     const bookingId = document.getElementById('bookingId').value
-    if (bookingId) {
+    if (bookingId && bookingId !== 'null') {
       google.script.run
         .withSuccessHandler(bookings => {
           if (bookings.length === 0) return
