@@ -20,18 +20,17 @@
           <thead>
             <tr>
               <th scope="col">Name</th>
-              <th class="d-none d-sm-table-cell" scope="col">Nr.</th>
+              <th class="col d-none d-sm-table-cell" scope="col">Nr.</th>
               <th scope="col">Kurs</th>
-              <th class="d-none d-sm-table-cell" scope="col">Ort</th>
+              <th class="col d-none d-sm-table-cell" scope="col">Ort</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody id="container">
           </tbody>
         </table>
-        <p class="lead mt-5"><i class="fa-regular fa-hand-point-right"></i> <a
-            href="<?!= getPreFilledFormUrl(data.origin, data.bookingId) ?>" target="_top">Hier</a> kannst
-          du weitere Kurse buchen.</p>
+        <p class="lead mt-5"><a href="<?!= getPreFilledFormUrl(data.origin, data.bookingId) ?>" target="_top">Hier</a>
+          kannst du weitere Kurse buchen.</p>
       </div>
   </div>
   </main>
@@ -53,11 +52,11 @@
           const [badgeState, badgeText] = (waitingList === 'Nein') ? ['success', 'angemeldet'] : ['danger', 'auf Warteliste']
           const responsible = (personResponsible === '') ? '' : `${personResponsible} (${phoneResponsible})`
           const row = `
-            <td>${firstName} ${lastName}</td>
-            <td class="d-none d-sm-table-cell">${eventId}</td>
-            <td> <label class="form-label">${eventName}</label></td>
-            <td class="d-none d-sm-table-cell">${meetingPoint}</td>
-            <td><span class="badge bg-${badgeState}">${badgeText}</span></td>
+            <td class="col col-sm-2">${firstName} ${lastName}</td>
+            <td class="col d-none d-sm-table-cell">${eventId}</td>
+            <td class="col"><label class="form-label line-clamp-2">${eventName}</label></td>
+            <td class="col d-none d-sm-table-cell col-md-auto">${meetingPoint}</td>
+            <td class="col"><span class="badge bg-${badgeState}">${badgeText}</span></td>
           `
           tableRow.innerHTML = row
           container.append(tableRow)
