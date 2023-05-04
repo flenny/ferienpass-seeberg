@@ -60,7 +60,9 @@
         if (!id) return
 
         const statusCell = dataTable.cell(`#event-${id}-status`)
-        if (statusCell) statusCell.data(getEventStatus(event))
+
+        // Update the status cell if it exists, otherwise add the event to the form
+        if (statusCell.data()) statusCell.data(getEventStatus(event))
         else addEventToForm(event)
       })
     }
@@ -149,7 +151,7 @@
       </tr>
     `
       // If the DataTable object exists, add the event to the table, otherwise append it to the table body
-      DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ? events.row.add($(result)) : events.insertAdjacentHTML('beforeend', result)
+      DataTable.isDataTable(`#${EVENTS_TABLE_ID}`) ? events.row.add($(result)).draw(false) : events.insertAdjacentHTML('beforeend', result)
     }
 
     const alertArea = document.getElementById('alertArea')
