@@ -48,6 +48,7 @@
       .withSuccessHandler(bookings => {
         Object.values(bookings).forEach(booking => {
           const tableRow = document.createElement('tr')
+          tableRow.classList.add("align-middle")
           const [, , , firstName, lastName, , , , , , , eventId, eventName, meetingPoint, , , personResponsible, phoneResponsible, waitingList] = booking
           const [badgeState, badgeText] = (waitingList === 'Nein') ? ['success', 'angemeldet'] : ['danger', 'auf Warteliste']
           const responsible = (personResponsible === '') ? '' : `${personResponsible} (${phoneResponsible})`
