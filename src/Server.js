@@ -3,7 +3,6 @@ const EVENTS_SHEET_NAME = 'Events'
 const VOLUNTEERS_SHEET_NAME = 'Volunteers'
 const SCRIPT_LOCK_TIMEOUT = 40000
 const EVENT_CACHE_IDENTIFIER = 'event-cache'
-const BOOKINGS_CACHE_IDENTIFIER = 'bookings-cache'
 const CACHE_EXPIRATION_TIMEOUT = 3600
 const TIMESTAMP_FORMAT = 'dd.MM.yyyy HH:mm:ss'
 const TIME_ZONE = 'Europe/Zurich'
@@ -55,16 +54,26 @@ function getEvents() {
 
 /** Gets the bookings for the specified reference. */
 function getBookings(reference) {
-  const result = CacheService.getScriptCache().get(BOOKINGS_CACHE_IDENTIFIER) ??
-    updateCache(BOOKINGS_CACHE_IDENTIFIER, BOOKINGS_SHEET_NAME)
-  return Object.values(JSON.parse(result))
-    .filter(booking => booking?.find(entry => entry === reference))
+  const lock = LockService.getScriptLock()
+  const hasLock = lock.tryLock(SCRIPT_LOCK_TIMEOUT)
+  if (!hasLock) { throw new Error('Could not obtain lock after 40 seconds.') }
+  try {
+    const spreadsheet = SpreadsheetApp.openById(
+      PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'))
+
+    return Object
+      .values(JSON.parse(getDataFromSheet(spreadsheet, BOOKINGS_SHEET_NAME)))
+      .filter(booking => booking?.find(entry => entry === reference))
+  }
+  catch (error) { throw error }
+  finally {
+    lock.releaseLock()
+  }
 }
 
-/** Updates all caches (event- and booking cache). */
-function updateCaches() {
+/** Updates the event cache. */
+function updateEventCache() {
   updateCache(EVENT_CACHE_IDENTIFIER, EVENTS_SHEET_NAME)
-  updateCache(BOOKINGS_CACHE_IDENTIFIER, BOOKINGS_SHEET_NAME)
 }
 
 function processForm(formObject) {
@@ -133,9 +142,8 @@ function processForm(formObject) {
       )
     }
 
-    // update caches
+    // update event cache
     CacheService.getScriptCache().put(EVENT_CACHE_IDENTIFIER, getDataFromSheet(spreadsheet, EVENTS_SHEET_NAME), CACHE_EXPIRATION_TIMEOUT)
-    CacheService.getScriptCache().put(BOOKINGS_CACHE_IDENTIFIER, getDataFromSheet(spreadsheet, BOOKINGS_SHEET_NAME), CACHE_EXPIRATION_TIMEOUT)
 
     // optional machen, oder try catch
     // unhandled exceptions per e-mail
