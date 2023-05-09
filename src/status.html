@@ -27,6 +27,9 @@
             </tr>
           </thead>
           <tbody id="container">
+            <td colspan="5">
+              <p class="lead"><i class="fa-solid fa-spinner fa-spin"></i>&ensp; Deine Daten werden geladen...</p>
+            </td>
           </tbody>
         </table>
         <p class="lead mt-5"><a href="<?!= getPreFilledFormUrl(data.origin, data.bookingId) ?>" target="_top">Hier</a>
@@ -46,6 +49,7 @@
     const container = document.getElementById('container')
     google.script.run
       .withSuccessHandler(bookings => {
+        container.innerHTML = ''
         Object.values(bookings).forEach(booking => {
           const tableRow = document.createElement('tr')
           tableRow.classList.add("align-middle")
