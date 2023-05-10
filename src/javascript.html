@@ -71,7 +71,7 @@
       const [id, , , , , , , , , , participantLimit, bookings, availableSeats] = event
       let [badgeState, badgeText] = ['success', 'freie Plätze']
       if (availableSeats <= 0) [badgeState, badgeText] = ['danger', 'Warteliste']
-      else if (availableSeats <= 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
+      else if (availableSeats < 5) [badgeState, badgeText] = ['warning', 'wenige Plätze']
       return `
       <br class="d-none d-md-block">
       <p>
