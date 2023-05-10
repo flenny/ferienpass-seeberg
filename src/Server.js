@@ -62,7 +62,7 @@ function getBookings(reference) {
       PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'))
 
     return Object
-      .values(JSON.parse(getDataFromSheet(spreadsheet, BOOKINGS_SHEET_NAME)))
+      .values(JSON.parse(getDataFromSheet(spreadsheet, BOOKINGS_SHEET_NAME, true)))
       .filter(booking => booking?.find(entry => entry === reference))
   }
   catch (error) { throw error }
@@ -212,12 +212,14 @@ function processForm(formObject) {
   finally { lock.releaseLock() }
 }
 
-const getDataFromSheet = (spreadsheet, sheetName) => {
+const getDataFromSheet = (spreadsheet, sheetName, ommitLastColumn) => {
   const sheet = spreadsheet.getSheetByName(sheetName)
   let numRows = sheet.getLastRow() - 1
   if (numRows === 0) numRows = 1
+  let numColumns = sheet.getLastColumn()
+  if (ommitLastColumn) numColumns = numColumns - 1
   return JSON.stringify(
-    sheet.getRange(2, 1, numRows, sheet.getLastColumn()).getValues()
+    sheet.getRange(2, 1, numRows, numColumns).getValues()
   )
 }
 
